@@ -6,6 +6,12 @@
 <meta name="description" content="Nexus — AI Career Strategist & Study Platform by Prakhar">
 <title>Nexus — AI Career Platform</title>
 <link rel="icon" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nexus">
 <link rel="stylesheet" href="css/main.css">
 <link rel="stylesheet" href="css/preloader.css">
 <link rel="stylesheet" href="css/chat.css">
@@ -231,6 +237,25 @@ document.querySelectorAll('.feature-input').forEach(input => {
         btn.disabled = !input.value.trim();
     });
 });
+})();
+
+// PWA Service Worker + Install Prompt
+(function(){
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(r => console.log('SW registered')).catch(e => console.log('SW error', e));
+  }
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (localStorage.getItem('nexus_pwa_dismissed')) return;
+    const banner = document.createElement('div');
+    banner.className = 'pwa-install-banner';
+    banner.innerHTML = '<img src="assets/icon-192.png" alt="Nexus"><div class="pwa-text"><div class="pwa-title">Install Nexus App</div><div class="pwa-desc">Add to home screen for the best experience</div></div><button class="pwa-install-btn" id="pwa-install">Install</button><button class="pwa-dismiss" id="pwa-dismiss">&times;</button>';
+    document.body.appendChild(banner);
+    document.getElementById('pwa-install').onclick = () => { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { banner.remove(); deferredPrompt = null; }); };
+    document.getElementById('pwa-dismiss').onclick = () => { banner.remove(); localStorage.setItem('nexus_pwa_dismissed','1'); };
+  });
 })();
 </script>
 </body>
