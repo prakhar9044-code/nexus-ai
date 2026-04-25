@@ -1,0 +1,120 @@
+/* ============================================
+   NEXUS — Preloader (Elegant & Minimal)
+   ============================================ */
+.preloader {
+    position: fixed; inset: 0;
+    background: var(--bg-primary);
+    z-index: 9999;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* Orbit animation */
+.preloader-orbit {
+    position: relative; width: 120px; height: 120px; margin-bottom: 32px;
+}
+.preloader-logo {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px; object-fit: contain;
+    animation: logo-breathe 2.5s ease-in-out infinite;
+}
+@keyframes logo-breathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Spinning circles */
+.orbit-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 1.5px solid var(--border); border-top-color: var(--accent);
+    animation: orbit-spin 1.8s linear infinite;
+}
+.orbit-ring:nth-child(2) {
+    inset: 12px; border-top-color: transparent;
+    border-right-color: var(--accent-light, var(--accent));
+    animation-duration: 2.5s; animation-direction: reverse;
+}
+.orbit-ring:nth-child(3) {
+    inset: 24px; border-top-color: transparent;
+    border-bottom-color: var(--text-tertiary);
+    animation-duration: 3.2s;
+}
+@keyframes orbit-spin { to { transform: rotate(360deg); } }
+
+/* Dots */
+.orbit-dot {
+    position: absolute; width: 5px; height: 5px;
+    background: var(--accent); border-radius: 50%;
+    animation: orbit-dot-move 2.5s ease-in-out infinite;
+}
+.orbit-dot:nth-child(5) { top: 0; left: 50%; animation-delay: 0s; }
+.orbit-dot:nth-child(6) { bottom: 0; right: 0; animation-delay: 0.8s; }
+.orbit-dot:nth-child(7) { top: 50%; left: 0; animation-delay: 1.6s; }
+@keyframes orbit-dot-move {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+}
+
+.preloader-brand {
+    text-align: center; animation: fade-up 0.6s ease 0.2s both;
+}
+.preloader-brand h1 {
+    font-family: var(--font-body); font-size: 1.5rem; font-weight: 700;
+    color: var(--text-primary); letter-spacing: -0.5px; margin-bottom: 4px;
+}
+.preloader-brand p {
+    font-size: 0.8rem; color: var(--text-tertiary);
+    letter-spacing: 2px; text-transform: uppercase; font-weight: 500;
+}
+
+/* Progress */
+.preloader-progress {
+    width: 200px; margin-top: 28px; animation: fade-up 0.6s ease 0.4s both;
+}
+.progress-track {
+    width: 100%; height: 2px; background: var(--border);
+    border-radius: var(--radius-full); overflow: hidden;
+}
+.progress-fill {
+    height: 100%; width: 0%; background: var(--accent);
+    border-radius: var(--radius-full); transition: width 0.4s ease;
+}
+
+.preloader-message {
+    margin-top: 16px; font-size: 0.8rem; color: var(--text-tertiary);
+    animation: fade-up 0.6s ease 0.6s both; min-height: 20px;
+    transition: opacity 0.2s ease;
+}
+
+.preloader-skip {
+    position: absolute; bottom: 32px;
+    background: none; border: 1px solid var(--border); color: var(--text-tertiary);
+    font-family: var(--font-body); font-size: 0.7rem; padding: 6px 16px;
+    border-radius: var(--radius-full); cursor: pointer;
+    transition: all var(--transition-fast); letter-spacing: 0.5px;
+    animation: fade-up 0.6s ease 0.8s both;
+}
+.preloader-skip:hover { color: var(--text-primary); border-color: var(--text-tertiary); }
+
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating particles (subtle) */
+.preloader-particles {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.particle {
+    position: absolute; border-radius: 50%; opacity: 0;
+    background: var(--accent); animation: particle-drift 6s ease-in-out infinite;
+}
+@keyframes particle-drift {
+    0% { opacity: 0; transform: translateY(100vh) scale(0); }
+    30% { opacity: 0.15; }
+    70% { opacity: 0.15; }
+    100% { opacity: 0; transform: translateY(-50px) scale(1); }
+}

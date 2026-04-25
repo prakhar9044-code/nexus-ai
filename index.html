@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-font-size="medium">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Nexus — AI Career Strategist & Study Platform by Prakhar">
+<title>Nexus — AI Career Platform</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/preloader.css">
+<link rel="stylesheet" href="css/chat.css">
+<link rel="stylesheet" href="css/features.css">
+<style>
+.compact-mode .message-bubble{padding:10px 14px}.hide-timestamps .message-time{display:none}
+</style>
+</head>
+<body>
+<!-- PRELOADER -->
+<div class="preloader" id="preloader">
+<div class="preloader-particles"></div>
+<div class="preloader-orbit"><div class="orbit-ring"></div><div class="orbit-ring"></div><div class="orbit-ring"></div><img src="assets/logo.png" alt="N" class="preloader-logo"><div class="orbit-dot"></div><div class="orbit-dot"></div><div class="orbit-dot"></div></div>
+<div class="preloader-brand"><h1>Nexus</h1><p>by Prakhar</p></div>
+<div class="preloader-progress"><div class="progress-track"><div class="progress-fill"></div></div></div>
+<div class="preloader-message">Preparing your workspace...</div>
+<button class="preloader-skip" id="preloader-skip">Skip</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<!-- Feature Nav (Icon sidebar) -->
+<nav class="feature-nav" id="feature-nav"></nav>
+
+<!-- Sidebar (chat history) -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header"><img src="assets/logo.png" alt="N" class="sidebar-logo"><div class="sidebar-brand"><h1>Nexus</h1><span>by Prakhar</span></div></div>
+<button class="new-chat-btn" id="new-chat-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Chat</button>
+<div class="chat-history"><div class="chat-history-title">Recent</div></div>
+<div class="sidebar-footer">
+<button class="sidebar-footer-btn" id="settings-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09c-.658.003-1.25.396-1.51 1z"/></svg>Settings</button>
+<button class="sidebar-footer-btn" id="export-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+</div>
+</aside>
+
+<!-- PANELS CONTAINER -->
+<div class="panels-container" style="flex:1;display:flex;flex-direction:column;min-width:0;">
+
+<!-- HEADER -->
+<header class="main-header">
+<div class="header-left">
+<button class="sidebar-toggle" id="sidebar-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+<div><div class="header-title">Nexus</div><div class="header-status"><span class="status-dot"></span>Ready</div></div>
+</div>
+<div class="header-right">
+<div class="speaking-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>Speaking...</div>
+<div class="voice-waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+<button class="header-btn" id="header-settings-btn" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg></button>
+</div>
+</header>
+
+<!-- CHAT PANEL -->
+<div class="feature-panel active" id="panel-chat">
+<div class="chat-container">
+<div class="welcome-screen">
+<img src="assets/logo.png" alt="Nexus" class="welcome-logo">
+<h2>Hey there! 👋</h2>
+<p>I'm Nexus, your AI-powered career strategist & study assistant — built by <strong>Prakhar</strong>. Ask me anything!</p>
+<div class="welcome-chips">
+<button class="welcome-chip" data-prompt="What's the best career path for a CS student?"><span class="chip-emoji">🎯</span>Career advice</button>
+<button class="welcome-chip" data-prompt="Explain the Pythagorean theorem"><span class="chip-emoji">📐</span>Math help</button>
+<button class="welcome-chip" data-prompt="Write a Python fibonacci function"><span class="chip-emoji">💻</span>Python code</button>
+<button class="welcome-chip" data-prompt="What are the best study techniques?"><span class="chip-emoji">🧠</span>Study tips</button>
+<button class="welcome-chip" data-prompt="Quiz me on science"><span class="chip-emoji">🔬</span>Science quiz</button>
+<button class="welcome-chip" data-prompt="Help me prepare for a tech interview"><span class="chip-emoji">🎤</span>Interview prep</button>
+</div>
+</div>
+<div class="messages-area" style="display:none;"></div>
+<div class="typing-indicator"><div class="message-avatar"><img src="assets/logo.png" alt="N"></div><div class="typing-dots"><span></span><span></span><span></span></div></div>
+</div>
+<div class="input-area">
+<div class="voice-preview"></div>
+<div class="attach-preview" id="attach-preview"><img class="attach-thumb" id="attach-thumb" src="" alt=""><div class="attach-info" id="attach-info"></div><button class="attach-remove" id="attach-remove" title="Remove">✕</button></div>
+<div class="input-wrapper">
+<textarea id="chat-input" placeholder="Ask me anything..." rows="1"></textarea>
+<input type="file" id="file-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none">
+<button class="input-btn attach-btn" id="attach-btn" title="Attach file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+<button class="input-btn stop-speak-btn" id="stop-speak-btn" title="Stop"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+<button class="input-btn mic-btn" id="mic-btn" title="Voice (Ctrl+M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+<button class="input-btn send-btn" id="send-btn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+</div>
+<div class="input-hint"><kbd>Enter</kbd> send · <kbd>Ctrl+M</kbd> voice · 📎 attach files</div>
+</div>
+</div>
+
+<!-- ALL FEATURE PANELS (generated by script) -->
+</div><!-- /panels-container -->
+</div><!-- /app -->
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+<div class="modal">
+<div class="modal-header"><h2>Settings</h2><button class="modal-close" id="settings-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<div class="modal-body">
+<div class="settings-section"><h3>Personalization</h3>
+<div class="setting-row"><div class="setting-label"><span>Your Name</span></div></div>
+<input type="text" class="setting-input" id="student-name-input" placeholder="Enter your name..." style="font-family:var(--font-body);margin-top:4px;">
+<div class="setting-row" style="margin-top:12px"><div class="setting-label"><span>I am a...</span><span style="font-size:0.7rem;color:var(--text-tertiary)">Nexus adapts to your level</span></div><select class="setting-select" id="user-level-select"><option value="kid">🧒 Class 5-8 Student</option><option value="highschool">🎓 High School (9-12)</option><option value="college" selected>🏫 College Student</option><option value="professional">💼 Working Professional</option></select></div>
+<div class="setting-row" style="margin-top:8px"><div class="setting-label"><span>Dark Mode</span></div><label class="toggle"><input type="checkbox" id="theme-toggle"><span class="toggle-slider"></span></label></div>
+<div class="setting-row"><div class="setting-label"><span>Language</span></div><select class="setting-select" id="lang-select"><option value="en">English</option><option value="hi">हिंदी (Hindi)</option></select></div>
+<div class="setting-row"><div class="setting-label"><span>Accent Color</span></div></div>
+<div class="color-options" id="accent-colors" style="margin-top:4px;"></div>
+<div class="setting-row" style="margin-top:8px"><div class="setting-label"><span>Font Size</span></div><select class="setting-select" id="font-size-select"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option></select></div>
+</div>
+<div class="settings-section"><h3>Voice</h3>
+<div class="setting-row"><div class="setting-label"><span>Read Responses Aloud</span></div><label class="toggle"><input type="checkbox" id="auto-speak-toggle" checked><span class="toggle-slider"></span></label></div>
+<div class="setting-row"><div class="setting-label"><span>Voice</span></div><select class="setting-select" id="voice-select"><option value="">Default</option></select></div>
+<div class="setting-row"><div class="setting-label"><span>Speed</span><span id="rate-value">1x</span></div><input type="range" class="setting-range" id="voice-rate" min="0.5" max="2" step="0.1" value="1"></div>
+<div class="setting-row"><div class="setting-label"><span>Pitch</span><span id="pitch-value">1</span></div><input type="range" class="setting-range" id="voice-pitch" min="0.5" max="2" step="0.1" value="1"></div>
+<div class="setting-row"><div class="setting-label"><span>Input Language</span></div><select class="setting-select" id="voice-lang"><option value="en-US">English (US)</option><option value="en-IN">English (India)</option><option value="hi-IN">Hindi</option><option value="en-GB">English (UK)</option></select></div>
+</div>
+<div class="settings-section"><h3>Display</h3>
+<div class="setting-row"><div class="setting-label"><span>Compact Mode</span></div><label class="toggle"><input type="checkbox" id="compact-toggle"><span class="toggle-slider"></span></label></div>
+<div class="setting-row"><div class="setting-label"><span>Timestamps</span></div><label class="toggle"><input type="checkbox" id="timestamps-toggle" checked><span class="toggle-slider"></span></label></div>
+</div>
+<div class="settings-section"><h3>Data</h3>
+<button class="btn-secondary" id="export-chat-btn" style="margin-bottom:8px">📥 Export Chat</button>
+<button class="btn-danger" id="clear-history-btn">Clear All History</button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="toast-container"></div>
+
+<!-- SCRIPTS -->
+<script src="js/preloader.js"></script>
+<script src="js/knowledge.js"></script>
+<script src="js/gemini.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/features/feature-chat.js"></script>
+<script src="js/features/all-features.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+// Build Feature Navigation + Panels dynamically
+(function(){
+const sections = [
+    {section:'General', items:[
+        {id:'chat',icon:'💬',label:'AI Chat'},
+        {id:'dashboard',icon:'📊',label:'Dashboard'},
+    ]},
+    {section:'Career', items:[
+        {id:'careerPath',icon:'🎯',label:'Career Path'},
+        {id:'skillAnalyzer',icon:'📊',label:'Skill Gap'},
+        {id:'resumeBuilder',icon:'📄',label:'Resume Builder'},
+        {id:'mockInterview',icon:'🎤',label:'Mock Interview'},
+        {id:'roadmap',icon:'📅',label:'Roadmap'},
+        {id:'jobMarket',icon:'📈',label:'Job Market'},
+    ]},
+    {section:'Learn', items:[
+        {id:'aiTeacher',icon:'🧑‍🏫',label:'AI Teacher'},
+        {id:'mentor',icon:'🤖',label:'Mentor Mode'},
+        {id:'projectIdeas',icon:'🧩',label:'Project Ideas'},
+        {id:'learningPath',icon:'🧠',label:'Learning Path'},
+        {id:'codingArena',icon:'🧪',label:'Coding Arena'},
+    ]},
+    {section:'Tools', items:[
+        {id:'gamification',icon:'🎮',label:'XP & Levels'},
+        {id:'recruiterSim',icon:'🧑‍💼',label:'Recruiter Sim'},
+        {id:'accountability',icon:'🔔',label:'Accountability'},
+        {id:'networking',icon:'🌐',label:'Networking'},
+        {id:'personality',icon:'🧬',label:'Personality'},
+        {id:'realityCheck',icon:'⚡',label:'Reality Check'},
+    ]}
+];
+
+const nav = document.getElementById('feature-nav');
+const container = document.querySelector('.panels-container');
+
+// Logo row
+nav.innerHTML = `<div class="fnav-logo-row" onclick="Router.go('chat')"><img src="assets/logo.png" alt="N" class="fnav-logo"><span class="fnav-logo-text">Nexus</span></div>`;
+
+sections.forEach(sec => {
+    nav.innerHTML += `<div class="fnav-section-label">${sec.section}</div>`;
+    sec.items.forEach(f => {
+        const btn = document.createElement('button');
+        btn.className = 'fnav-item' + (f.id==='chat'?' active':'');
+        btn.dataset.feature = f.id;
+        btn.innerHTML = `<span class="fnav-emoji">${f.icon}</span><span class="fnav-label">${f.label}</span>`;
+        nav.appendChild(btn);
+
+        // Create panels for non-chat, non-dashboard features
+        if (f.id !== 'chat' && f.id !== 'dashboard') {
+            const panel = document.createElement('div');
+            panel.className = 'feature-panel'; panel.id = 'panel-' + f.id;
+            panel.innerHTML = `
+                <div class="feature-header"><div class="feature-header-left"><span class="feature-icon">${f.icon}</span><div><h2>${f.label}</h2></div></div></div>
+                <div class="feature-body" style="padding:0;display:flex;flex-direction:column;flex:1;min-height:0;">
+                    <div class="feature-chat" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+                        <div class="feature-messages" style="flex:1;overflow-y:auto;padding:16px 24px;"></div>
+                        <div class="feature-input-area" style="padding:12px 24px 16px;border-top:1px solid var(--border);">
+                            <div class="feature-input-wrapper"><textarea class="feature-input" placeholder="Type your message..." rows="1"></textarea><button class="fbtn fbtn-primary fbtn-send" disabled style="width:38px;height:38px;border-radius:12px;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>
+                        </div>
+                    </div>
+                </div>`;
+            container.appendChild(panel);
+        } else if (f.id === 'dashboard' || f.id === 'gamification') {
+            const panel = document.createElement('div');
+            panel.className = 'feature-panel'; panel.id = 'panel-' + f.id;
+            panel.innerHTML = `<div class="feature-header"><div class="feature-header-left"><span class="feature-icon">${f.icon}</span><div><h2>${f.label}</h2></div></div></div><div class="feature-body"></div>`;
+            container.appendChild(panel);
+        }
+    });
+});
+
+// Footer
+const footer = document.createElement('div');
+footer.className = 'fnav-footer';
+footer.innerHTML = 'Made with ❤️ by <a href="#">Prakhar</a>';
+nav.appendChild(footer);
+
+// Wire up feature inputs
+document.querySelectorAll('.feature-input').forEach(input => {
+    const btn = input.closest('.feature-input-area')?.querySelector('.fbtn-send');
+    if (!btn) return;
+    input.addEventListener('input', () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+        btn.disabled = !input.value.trim();
+    });
+});
+})();
+</script>
+</body>
+</html>
