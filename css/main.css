@@ -361,8 +361,11 @@ body {
 @media (max-width: 768px) {
     :root { --sidebar-width: 0px; --header-height: 50px; }
 
-    /* Sidebar: slide-in overlay */
-    .sidebar { position: fixed; left: 0; top: 0; width: 280px; transform: translateX(-100%); z-index: 900; box-shadow: none; }
+    /* Force app to be single column */
+    #app { flex-direction: column; width: 100vw; overflow-x: hidden; }
+
+    /* Sidebar: slide-in overlay, completely out of flow */
+    .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; transform: translateX(-100%); z-index: 900; box-shadow: none; }
     .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-xl); }
     .sidebar-toggle { display: flex; }
 
