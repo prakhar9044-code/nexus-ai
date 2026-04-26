@@ -16,6 +16,7 @@ const Settings = (() => {
         document.getElementById('theme-toggle')?.addEventListener('change', e => { localStorage.setItem('nexus_theme', e.target.checked?'dark':'light'); applyTheme(); });
         document.getElementById('font-size-select')?.addEventListener('change', e => { localStorage.setItem('nexus_font_size', e.target.value); document.documentElement.dataset.fontSize=e.target.value; });
         document.getElementById('student-name-input')?.addEventListener('change', e => { localStorage.setItem('nexus_student_name', e.target.value.trim()); updateWelcomeName(); });
+        document.getElementById('api-key-input')?.addEventListener('change', e => { const key = e.target.value.trim(); localStorage.setItem('nexus_api_key', key); Toast.show(key ? '🔑 API key saved!' : '⚠️ API key removed', key ? 'success' : 'info'); });
         document.getElementById('auto-speak-toggle')?.addEventListener('change', e => localStorage.setItem('nexus_auto_speak', e.target.checked.toString()));
         document.getElementById('voice-select')?.addEventListener('change', e => localStorage.setItem('nexus_voice_name', e.target.value));
         document.getElementById('voice-rate')?.addEventListener('input', e => { localStorage.setItem('nexus_voice_rate', e.target.value); document.getElementById('rate-value').textContent=e.target.value+'x'; });
@@ -44,8 +45,14 @@ const Settings = (() => {
         if(el('user-level-select')) el('user-level-select').value = localStorage.getItem('nexus_user_level')||'college';
         if(el('compact-toggle')) el('compact-toggle').checked = localStorage.getItem('nexus_compact')==='true';
         document.body.classList.toggle('compact-mode', localStorage.getItem('nexus_compact')==='true');
+        if(el('api-key-input')) el('api-key-input').value = localStorage.getItem('nexus_api_key')||'';
         if(el('timestamps-toggle')) el('timestamps-toggle').checked = localStorage.getItem('nexus_timestamps')!=='false';
         document.body.classList.toggle('hide-timestamps', localStorage.getItem('nexus_timestamps')==='false');
+
+        // Auto-open settings if no API key
+        if (!localStorage.getItem('nexus_api_key')) {
+            setTimeout(() => { open(); Toast.show('🔑 Please add your Gemini API key to get started!', 'info', 5000); }, 1500);
+        }
     }
 
     function applyTheme() {

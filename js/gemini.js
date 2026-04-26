@@ -1,8 +1,8 @@
 /* NEXUS v2.0 — Gemini AI Engine with Multi-Context Prompts */
 const Nexus = (() => {
-    const API_KEY = 'AIzaSyBZUUC1ZvvvJkDc2i1KO0CYNqEC0ECA-ag';
+    function getApiKey() { return localStorage.getItem('nexus_api_key') || ''; }
     const MODEL = 'gemini-2.5-flash';
-    const URL_BASE = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}`;
+    function getUrlBase() { return `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}`; }
 
     const PROMPTS = {
         chat: `You are Nexus — a warm, knowledgeable, and professional AI study assistant developed by Prakhar. You help students learn across all subjects. Use markdown formatting, tables, code blocks. Be encouraging, clear, and thorough. Use emojis occasionally. Respond in the same language the user writes in (English or Hindi).`,
@@ -204,6 +204,10 @@ When the user tells you what they did, award XP appropriately and show their upd
 
     // Raw stream from API
     async function* rawStream(featureId, userMessage, extraContext = '') {
+        const apiKey = getApiKey();
+        if (!apiKey) {
+            throw new Error('Please add your Gemini API key in Settings first! ⚙️');
+        }
         const conv = getConversation(featureId);
         conv.push({ role: 'user', parts: [{ text: userMessage }] });
 
@@ -214,7 +218,7 @@ When the user tells you what they did, award XP appropriately and show their upd
         const extra = extraContext ? '\nContext: ' + extraContext : '';
         const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra;
 
-        const url = `${URL_BASE}:streamGenerateContent?alt=sse&key=${API_KEY}`;
+        const url = `${getUrlBase()}:streamGenerateContent?alt=sse&key=${apiKey}`;
         const body = {
             system_instruction: { parts: [{ text: fullPrompt }] },
             contents: conv,
