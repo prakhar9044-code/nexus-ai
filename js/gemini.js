@@ -202,12 +202,9 @@ When the user tells you what they did, award XP appropriately and show their upd
         return contexts[level] || contexts.college;
     }
 
-    // Raw stream from API
+    // Raw stream from API (uses Netlify proxy by default, direct API as fallback)
     async function* rawStream(featureId, userMessage, extraContext = '') {
-        const apiKey = getApiKey();
-        if (!apiKey) {
-            throw new Error('Please add your Gemini API key in Settings first! ⚙️');
-        }
+        const userKey = getApiKey(); // Optional: user's own key from Settings
         const conv = getConversation(featureId);
         conv.push({ role: 'user', parts: [{ text: userMessage }] });
 
@@ -218,8 +215,8 @@ When the user tells you what they did, award XP appropriately and show their upd
         const extra = extraContext ? '\nContext: ' + extraContext : '';
         const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra;
 
-        const url = `${getUrlBase()}:streamGenerateContent?alt=sse&key=${apiKey}`;
-        const body = {
+        const requestBody = {
+            model: MODEL,
             system_instruction: { parts: [{ text: fullPrompt }] },
             contents: conv,
             generationConfig: { temperature: 0.7, topP: 0.9, maxOutputTokens: 4096 },
@@ -231,8 +228,13 @@ When the user tells you what they did, award XP appropriately and show their upd
             ]
         };
 
+        // Use Netlify proxy by default, direct API if user provided their own key
+        const url = userKey
+            ? `${getUrlBase()}:streamGenerateContent?alt=sse&key=${userKey}`
+            : '/api/chat';
+
         try {
-            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
             if (!resp.ok) {
                 conv.pop();
                 if (resp.status === 429) throw new Error('Rate limited — please wait a moment.');

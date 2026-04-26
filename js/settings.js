@@ -48,11 +48,6 @@ const Settings = (() => {
         if(el('api-key-input')) el('api-key-input').value = localStorage.getItem('nexus_api_key')||'';
         if(el('timestamps-toggle')) el('timestamps-toggle').checked = localStorage.getItem('nexus_timestamps')!=='false';
         document.body.classList.toggle('hide-timestamps', localStorage.getItem('nexus_timestamps')==='false');
-
-        // Auto-open settings if no API key
-        if (!localStorage.getItem('nexus_api_key')) {
-            setTimeout(() => { open(); Toast.show('🔑 Please add your Gemini API key to get started!', 'info', 5000); }, 1500);
-        }
     }
 
     function applyTheme() {
