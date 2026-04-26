@@ -139,12 +139,31 @@ const App = (() => {
     }
 
     function setupNav() {
+        const featureNav = document.getElementById('feature-nav');
+        const mobileBtn = document.getElementById('mobile-features-btn');
+        const mobileOverlay = document.getElementById('mobile-nav-overlay');
+
+        function closeMobileNav() {
+            featureNav?.classList.remove('mobile-open');
+            mobileOverlay?.classList.remove('active');
+        }
+
         document.querySelectorAll('.fnav-item').forEach(item => {
             item.addEventListener('click', () => {
                 const feature = item.dataset.feature;
                 if (feature) Router.go(feature);
+                closeMobileNav(); // Auto-close on mobile
             });
         });
+
+        // Mobile nav toggle
+        mobileBtn?.addEventListener('click', () => {
+            featureNav?.classList.toggle('mobile-open');
+            mobileOverlay?.classList.toggle('active');
+        });
+        mobileOverlay?.addEventListener('click', closeMobileNav);
+
+        // Sidebar toggle
         const toggle = document.getElementById('sidebar-toggle');
         const sidebar = document.querySelector('.sidebar');
         if (toggle && sidebar) toggle.addEventListener('click', () => sidebar.classList.toggle('open'));

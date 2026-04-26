@@ -357,11 +357,49 @@ body {
     align-items: center; justify-content: center; color: white; font-size: 0.65rem; font-weight: 700;
 }
 
-/* Responsive */
+/* ========== MOBILE RESPONSIVE ========== */
 @media (max-width: 768px) {
-    .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); z-index: 900; }
-    .sidebar.open { transform: translateX(0); }
+    :root { --sidebar-width: 0px; --header-height: 50px; }
+
+    /* Sidebar: slide-in overlay */
+    .sidebar { position: fixed; left: 0; top: 0; width: 280px; transform: translateX(-100%); z-index: 900; box-shadow: none; }
+    .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-xl); }
     .sidebar-toggle { display: flex; }
-    .main-header { padding: 0 16px; }
-    .modal { width: 95%; }
+
+    /* Header compact */
+    .main-header { padding: 0 12px; height: var(--header-height); }
+    .header-title { font-size: 0.9rem; }
+    .speaking-label { font-size: 0.65rem; }
+
+    /* Modal: slide-up bottom sheet on mobile */
+    .modal-overlay { align-items: flex-end; }
+    .modal {
+        width: 100% !important; max-width: 100% !important; max-height: 92vh;
+        border-radius: 20px 20px 0 0; border-bottom: none;
+        transform: translateY(100%);
+    }
+    .modal-overlay.active .modal { transform: translateY(0); }
+    .modal-header { padding: 16px 16px 10px; position: sticky; top: 0; background: var(--bg-primary); z-index: 1; }
+    .modal-body { padding: 10px 16px 32px; }
+    .setting-row { padding: 8px 0; }
+    .setting-label span:first-child { font-size: 0.82rem; }
+    .setting-select { min-width: 110px; font-size: 0.78rem; }
+    .color-options { flex-wrap: wrap; gap: 6px; }
+    .color-option { width: 26px; height: 26px; }
+
+    /* Toast */
+    .toast-container { top: 8px; right: 8px; left: 8px; }
+    .toast { max-width: 100%; font-size: 0.78rem; padding: 10px 14px; }
+
+    /* PWA install banner — animated popup */
+    .pwa-install-banner {
+        left: 12px !important; right: 12px !important; bottom: 72px !important;
+        transform: none !important; max-width: 100% !important;
+        border-radius: 16px; padding: 16px;
+        animation: pwa-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    }
+    @keyframes pwa-slide-up {
+        from { opacity: 0; transform: translateY(80px) scale(0.9); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
 }

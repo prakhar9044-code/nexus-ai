@@ -264,10 +264,26 @@
 }
 
 @media (max-width: 768px) {
-    .chat-container { padding: 16px; }
-    .input-area { padding: 8px 16px 12px; }
-    .message { max-width: 95%; }
-    .welcome-screen { padding: 24px 16px; }
-    .welcome-screen h2 { font-size: 1.3rem; }
+    .chat-container { padding: 12px 10px; }
+    .input-area { padding: 6px 10px 10px; }
+    .input-wrapper { padding: 4px 4px 4px 14px; border-radius: 16px; gap: 4px; }
+    #chat-input { font-size: 0.88rem; min-height: 36px; }
+    .input-btn { width: 34px; height: 34px; border-radius: 10px; }
+    .input-btn svg { width: 16px; height: 16px; }
+    .input-hint { font-size: 0.6rem; padding-top: 4px; }
+    .message { max-width: 95%; gap: 8px; }
+    .message-avatar { width: 28px; height: 28px; }
+    .nexus-message .message-avatar img { width: 18px; height: 18px; }
+    .message-bubble { padding: 10px 14px; font-size: 0.86rem; line-height: 1.6; border-radius: 14px; }
+    .message-bubble pre { padding: 12px; margin: 6px 0; font-size: 0.78rem; }
+    .message-bubble table { font-size: 0.78rem; }
+    .message-bubble th, .message-bubble td { padding: 6px 8px; }
+    .welcome-screen { padding: 20px 14px; }
+    .welcome-logo { width: 44px; height: 44px; margin-bottom: 14px; }
+    .welcome-screen h2 { font-size: 1.2rem; }
+    .welcome-screen p { font-size: 0.85rem; margin-bottom: 20px; }
     .welcome-chips { gap: 6px; }
+    .welcome-chip { padding: 8px 12px; font-size: 0.76rem; }
+    .voice-preview { padding: 2px 14px; font-size: 0.72rem; }
+    .attach-preview { padding: 4px 10px; }
 }
