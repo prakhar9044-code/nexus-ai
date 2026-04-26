@@ -1,5 +1,8 @@
 /* NEXUS v2.0 — Features Styles */
 
+/* Hide mobile-only elements on desktop */
+.mobile-features-btn, .mobile-nav-overlay { display: none; }
+
 /* ---- Feature Navigation (Labeled Sidebar) ---- */
 .feature-nav {
     width: 200px; height: 100vh;
@@ -341,32 +344,36 @@
 
 /* ---- Mobile Feature Nav → Bottom Sheet Toggle ---- */
 @media (max-width: 768px) {
-    /* Feature nav: hidden by default, slides up as bottom sheet */
+    /* CRITICAL: fully hide feature-nav from flex flow */
     .feature-nav {
+        display: none !important;
         position: fixed; bottom: 0; left: 0; right: 0;
         width: 100% !important; height: auto; max-height: 70vh;
         flex-direction: column; z-index: 800;
-        transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         border-right: none; border-top: 1px solid var(--border);
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-        box-shadow: 0 -8px 32px rgba(0,0,0,0.2);
-        padding: 8px 12px 20px;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -8px 32px rgba(0,0,0,0.25);
+        padding: 12px 16px 24px;
         overflow-y: auto;
+        background: var(--bg-primary);
+        animation: sheet-up 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .feature-nav.mobile-open { transform: translateY(0); }
+    .feature-nav.mobile-open { display: flex !important; }
+    @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     .fnav-logo-row { display: none; }
-    .fnav-section-label { font-size: 0.55rem; padding: 6px 8px 2px; }
-    .fnav-item { height: 40px; font-size: 0.82rem; padding: 0 12px; border-radius: var(--radius-sm); }
-    .fnav-footer { padding: 8px 0 0; font-size: 0.55rem; }
+    .fnav-section-label { font-size: 0.6rem; padding: 10px 8px 4px; }
+    .fnav-item { height: 44px; font-size: 0.88rem; padding: 0 14px; border-radius: 10px; }
+    .fnav-item .fnav-emoji { font-size: 1.1rem; }
+    .fnav-footer { padding: 10px 0 0; font-size: 0.6rem; }
 
-    /* Mobile nav toggle button (hamburger for features) */
+    /* Mobile FAB */
     .mobile-features-btn {
-        position: fixed; bottom: 16px; left: 16px;
-        width: 48px; height: 48px; border-radius: 50%; z-index: 799;
+        position: fixed; bottom: 18px; left: 18px;
+        width: 52px; height: 52px; border-radius: 50%; z-index: 799;
         background: var(--accent); color: white; border: none;
         box-shadow: 0 4px 20px rgba(74,108,247,0.4);
-        font-size: 1.3rem; cursor: pointer;
+        font-size: 1.4rem; cursor: pointer;
         display: flex; align-items: center; justify-content: center;
         transition: all 0.3s ease;
         animation: fab-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -376,29 +383,32 @@
 
     /* Mobile nav overlay */
     .mobile-nav-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
         z-index: 799; opacity: 0; visibility: hidden;
-        transition: all 0.3s ease; backdrop-filter: blur(2px);
+        transition: all 0.3s ease; backdrop-filter: blur(3px);
     }
     .mobile-nav-overlay.active { opacity: 1; visibility: visible; }
+
+    /* Panels container: full width */
+    .panels-container { width: 100% !important; }
 
     /* Feature panels */
     .feature-header { padding: 12px 14px; }
     .feature-header h2 { font-size: 1rem; }
-    .feature-body { padding: 12px; }
-    .fcard { padding: 14px; }
+    .feature-body { padding: 10px; }
+    .fcard { padding: 12px; }
     .fcard-grid { grid-template-columns: 1fr; }
     .stat-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .stat-card { padding: 12px; }
-    .stat-value { font-size: 1.3rem; }
+    .stat-card { padding: 10px; }
+    .stat-value { font-size: 1.2rem; }
     .persona-grid { grid-template-columns: repeat(2, 1fr); }
     .scorecard { grid-template-columns: 1fr; }
-    .gamification-hero { flex-direction: column; text-align: center; padding: 16px; }
-    .xp-level-badge { width: 52px; height: 52px; font-size: 1.6rem; }
-    .xp-total { font-size: 1.4rem; }
+    .gamification-hero { flex-direction: column; text-align: center; padding: 14px; }
+    .xp-level-badge { width: 48px; height: 48px; font-size: 1.5rem; }
+    .xp-total { font-size: 1.3rem; }
 
-    /* Feature messages area */
-    .feature-messages { padding: 12px 14px !important; }
-    .feature-input-area { padding: 8px 14px 12px !important; }
+    /* Feature messages */
+    .feature-messages { padding: 10px 12px !important; }
+    .feature-input-area { padding: 8px 12px 10px !important; }
     .feature-input-wrapper { gap: 6px; }
 }
