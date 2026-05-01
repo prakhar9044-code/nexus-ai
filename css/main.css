@@ -365,9 +365,22 @@ body {
     #app { flex-direction: column; width: 100vw; overflow-x: hidden; }
 
     /* Sidebar: slide-in overlay, completely out of flow */
-    .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; transform: translateX(-100%); z-index: 900; box-shadow: none; }
+    .sidebar {
+        position: fixed; left: 0; top: 0; width: 280px; height: 100vh;
+        transform: translateX(-100%); z-index: 950; box-shadow: none;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
     .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-xl); }
     .sidebar-toggle { display: flex; }
+
+    /* Sidebar dark overlay */
+    .sidebar-overlay {
+        position: fixed; inset: 0; z-index: 940;
+        background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
+        opacity: 0; visibility: hidden; pointer-events: none;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
     /* Header compact */
     .main-header { padding: 0 12px; height: var(--header-height); }

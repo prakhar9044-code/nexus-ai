@@ -160,15 +160,49 @@ const App = (() => {
         mobileBtn?.addEventListener('click', () => {
             featureNav?.classList.toggle('mobile-open');
             mobileOverlay?.classList.toggle('active');
+            closeSidebar(); // Close sidebar if open
         });
         mobileOverlay?.addEventListener('click', closeMobileNav);
 
-        // Sidebar toggle
+        // Sidebar toggle with overlay
         const toggle = document.getElementById('sidebar-toggle');
         const sidebar = document.querySelector('.sidebar');
-        if (toggle && sidebar) toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
-        document.getElementById('settings-btn')?.addEventListener('click', () => Settings.open());
-        document.getElementById('header-settings-btn')?.addEventListener('click', () => Settings.open());
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            sidebar?.classList.add('open');
+            sidebarOverlay?.classList.add('active');
+            closeMobileNav(); // Close feature nav if open
+        }
+        function closeSidebar() {
+            sidebar?.classList.remove('open');
+            sidebarOverlay?.classList.remove('active');
+        }
+
+        if (toggle) toggle.addEventListener('click', () => {
+            if (sidebar?.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+
+        // Close sidebar when tapping overlay
+        sidebarOverlay?.addEventListener('click', closeSidebar);
+
+        // Close sidebar when selecting a chat from history
+        document.querySelector('.chat-history')?.addEventListener('click', e => {
+            if (e.target.closest('.history-item')) closeSidebar();
+        });
+
+        // Close sidebar when "New Chat" is clicked
+        document.getElementById('new-chat-btn')?.addEventListener('click', () => {
+            setTimeout(closeSidebar, 100);
+        });
+
+        // Settings button closes sidebar first
+        document.getElementById('settings-btn')?.addEventListener('click', () => { closeSidebar(); Settings.open(); });
+        document.getElementById('header-settings-btn')?.addEventListener('click', () => { closeSidebar(); Settings.open(); });
     }
 
     function setupVoice() {
