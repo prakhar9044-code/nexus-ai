@@ -393,16 +393,103 @@ body {
     /* Toast */
     .toast-container { top: 8px; right: 8px; left: 8px; }
     .toast { max-width: 100%; font-size: 0.78rem; padding: 10px 14px; }
-
-    /* PWA install banner — animated popup */
-    .pwa-install-banner {
-        left: 12px !important; right: 12px !important; bottom: 72px !important;
-        transform: none !important; max-width: 100% !important;
-        border-radius: 16px; padding: 16px;
-        animation: pwa-slide-up 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    }
-    @keyframes pwa-slide-up {
-        from { opacity: 0; transform: translateY(80px) scale(0.9); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-    }
 }
+
+/* ========== PWA INSTALL POPUP ========== */
+#pwa-popup-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+#pwa-popup-overlay.active { opacity: 1; visibility: visible; }
+#pwa-popup-overlay.closing { opacity: 0; visibility: hidden; }
+
+.pwa-popup {
+    position: relative;
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: 24px; padding: 36px 28px 28px;
+    max-width: 340px; width: 100%;
+    text-align: center; overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05);
+    transform: scale(0.8) translateY(40px);
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#pwa-popup-overlay.active .pwa-popup {
+    transform: scale(1) translateY(0);
+}
+#pwa-popup-overlay.closing .pwa-popup {
+    transform: scale(0.85) translateY(30px);
+}
+
+.pwa-popup-glow {
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,108,247,0.25) 0%, transparent 70%);
+    pointer-events: none; animation: pwa-glow-pulse 3s ease-in-out infinite;
+}
+@keyframes pwa-glow-pulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.15); }
+}
+
+.pwa-popup-close {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none; color: var(--text-tertiary);
+    font-size: 1.5rem; cursor: pointer; width: 32px; height: 32px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease; line-height: 1;
+}
+.pwa-popup-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.pwa-popup-icon {
+    margin: 0 auto 16px; width: 72px; height: 72px;
+    border-radius: 18px; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(74,108,247,0.2);
+    animation: pwa-icon-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+.pwa-popup-icon img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes pwa-icon-bounce {
+    from { transform: scale(0) rotate(-15deg); opacity: 0; }
+    to { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.pwa-popup-title {
+    font-size: 1.2rem; font-weight: 700; color: var(--text-primary);
+    margin-bottom: 8px; letter-spacing: -0.3px;
+}
+.pwa-popup-desc {
+    font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+.pwa-popup-features {
+    display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+.pwa-popup-features span {
+    padding: 5px 12px; background: var(--accent-subtle);
+    border: 1px solid var(--accent-border); border-radius: 20px;
+    font-size: 0.7rem; font-weight: 500; color: var(--accent);
+    white-space: nowrap;
+}
+
+.pwa-popup-install {
+    width: 100%; padding: 14px 24px; border: none; border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+    color: white; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.25s ease; box-shadow: 0 4px 16px rgba(74,108,247,0.35);
+}
+.pwa-popup-install:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(74,108,247,0.45); }
+.pwa-popup-install:active { transform: translateY(0); }
+
+.pwa-popup-later {
+    width: 100%; padding: 10px; margin-top: 10px;
+    background: none; border: none; color: var(--text-tertiary);
+    font-family: var(--font-body); font-size: 0.78rem; cursor: pointer;
+    transition: color 0.2s ease;
+}
+.pwa-popup-later:hover { color: var(--text-secondary); }
