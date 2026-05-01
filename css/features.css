@@ -369,8 +369,10 @@
     }
 
     .fnav-logo-row { display: none; }
-    .fnav-section-label { font-size: 0.6rem; padding: 10px 8px 4px; }
-    .fnav-item { height: 44px; font-size: 0.88rem; padding: 0 14px; border-radius: 10px; }
+    /* Show labels and section titles in bottom sheet (override 900px hide) */
+    .fnav-label { display: inline !important; }
+    .fnav-section-label { display: block !important; font-size: 0.65rem; padding: 10px 8px 4px; text-transform: uppercase; letter-spacing: 1px; }
+    .fnav-item { height: 44px; font-size: 0.88rem; padding: 0 14px; border-radius: 10px; justify-content: flex-start !important; width: 100% !important; gap: 10px; }
     .fnav-item .fnav-emoji { font-size: 1.1rem; }
     .fnav-footer { padding: 10px 0 0; font-size: 0.6rem; }
 

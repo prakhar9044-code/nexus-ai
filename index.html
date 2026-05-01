@@ -12,10 +12,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Nexus">
-<link rel="stylesheet" href="css/main.css?v=5">
-<link rel="stylesheet" href="css/preloader.css?v=5">
-<link rel="stylesheet" href="css/chat.css?v=5">
-<link rel="stylesheet" href="css/features.css?v=5">
+<link rel="stylesheet" href="css/main.css?v=6">
+<link rel="stylesheet" href="css/preloader.css?v=6">
+<link rel="stylesheet" href="css/chat.css?v=6">
+<link rel="stylesheet" href="css/features.css?v=6">
 <style>
 .compact-mode .message-bubble{padding:10px 14px}.hide-timestamps .message-time{display:none}
 </style>
@@ -149,15 +149,15 @@
 <div class="toast-container"></div>
 
 <!-- SCRIPTS -->
-<script src="js/preloader.js?v=5"></script>
-<script src="js/knowledge.js?v=5"></script>
-<script src="js/gemini.js?v=5"></script>
-<script src="js/voice.js?v=5"></script>
-<script src="js/chat.js?v=5"></script>
-<script src="js/settings.js?v=5"></script>
-<script src="js/features/feature-chat.js?v=5"></script>
-<script src="js/features/all-features.js?v=5"></script>
-<script src="js/app.js?v=5"></script>
+<script src="js/preloader.js?v=6"></script>
+<script src="js/knowledge.js?v=6"></script>
+<script src="js/gemini.js?v=6"></script>
+<script src="js/voice.js?v=6"></script>
+<script src="js/chat.js?v=6"></script>
+<script src="js/settings.js?v=6"></script>
+<script src="js/features/feature-chat.js?v=6"></script>
+<script src="js/features/all-features.js?v=6"></script>
+<script src="js/app.js?v=6"></script>
 
 <script>
 // Build Feature Navigation + Panels dynamically
@@ -249,25 +249,139 @@ document.querySelectorAll('.feature-input').forEach(input => {
 });
 })();
 
-// PWA Service Worker + Animated Install Popup
+// ====== ONBOARDING (First Visit) ======
+(function(){
+  if (localStorage.getItem('nexus_onboarded')) return;
+  // Wait for preloader to finish
+  setTimeout(() => showOnboarding(), 2000);
+
+  function showOnboarding() {
+    const overlay = document.createElement('div');
+    overlay.id = 'onboarding-overlay';
+    overlay.innerHTML = `
+      <div class="onboarding-popup">
+        <div class="onboarding-glow"></div>
+        <div class="onboarding-step active" id="onb-step-1">
+          <div class="onb-emoji">👋</div>
+          <h3>Welcome to Nexus!</h3>
+          <p>Let's personalize your experience. It takes just 10 seconds.</p>
+          <input type="text" class="onb-input" id="onb-name" placeholder="What's your name?" autocomplete="off" maxlength="30">
+          <button class="onb-next" id="onb-next-1">Continue →</button>
+        </div>
+        <div class="onboarding-step" id="onb-step-2">
+          <div class="onb-emoji">🎓</div>
+          <h3>What describes you best?</h3>
+          <div class="onb-options" id="onb-roles">
+            <label class="onb-option"><input type="radio" name="role" value="school"><span>🏫 School Student</span></label>
+            <label class="onb-option"><input type="radio" name="role" value="college" checked><span>🎓 College Student</span></label>
+            <label class="onb-option"><input type="radio" name="role" value="working"><span>💼 Working Professional</span></label>
+            <label class="onb-option"><input type="radio" name="role" value="other"><span>🌟 Other / Exploring</span></label>
+          </div>
+          <button class="onb-next" id="onb-next-2">Continue →</button>
+        </div>
+        <div class="onboarding-step" id="onb-step-3">
+          <div class="onb-emoji">🚀</div>
+          <h3>What are you interested in?</h3>
+          <p style="font-size:0.78rem;color:var(--text-tertiary);margin-bottom:12px;">Pick a few so Nexus can help better</p>
+          <div class="onb-chips" id="onb-interests">
+            <button class="onb-chip" data-v="coding">💻 Coding</button>
+            <button class="onb-chip" data-v="career">🎯 Career</button>
+            <button class="onb-chip" data-v="math">📐 Math</button>
+            <button class="onb-chip" data-v="science">🔬 Science</button>
+            <button class="onb-chip" data-v="business">📊 Business</button>
+            <button class="onb-chip" data-v="design">🎨 Design</button>
+            <button class="onb-chip" data-v="language">🌍 Languages</button>
+            <button class="onb-chip" data-v="exam">📝 Exam Prep</button>
+          </div>
+          <button class="onb-next" id="onb-finish">Let's Go! 🚀</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('active'));
+
+    // Chip selection
+    overlay.querySelectorAll('.onb-chip').forEach(c => {
+      c.addEventListener('click', () => c.classList.toggle('selected'));
+    });
+
+    // Step 1 → 2
+    document.getElementById('onb-next-1').onclick = () => {
+      const name = document.getElementById('onb-name').value.trim();
+      if (name) localStorage.setItem('nexus_student_name', name);
+      document.getElementById('onb-step-1').classList.remove('active');
+      document.getElementById('onb-step-2').classList.add('active');
+    };
+
+    // Step 2 → 3
+    document.getElementById('onb-next-2').onclick = () => {
+      const role = document.querySelector('input[name="role"]:checked')?.value || 'college';
+      const roleMap = { school: 'Class 5-8 Student', college: 'College Student', working: 'Working Professional', other: 'College Student' };
+      localStorage.setItem('nexus_level', roleMap[role]);
+      document.getElementById('onb-step-2').classList.remove('active');
+      document.getElementById('onb-step-3').classList.add('active');
+    };
+
+    // Finish
+    document.getElementById('onb-finish').onclick = () => {
+      const interests = [...overlay.querySelectorAll('.onb-chip.selected')].map(c => c.dataset.v);
+      localStorage.setItem('nexus_interests', JSON.stringify(interests));
+      localStorage.setItem('nexus_onboarded', '1');
+      // Apply name to settings
+      const nameInput = document.getElementById('student-name-input');
+      if (nameInput) nameInput.value = localStorage.getItem('nexus_student_name') || '';
+      // Update welcome
+      const h2 = document.querySelector('.welcome-screen h2');
+      const uname = localStorage.getItem('nexus_student_name');
+      if (h2 && uname) h2.textContent = `Hey ${uname}! 👋`;
+      // Close
+      overlay.classList.remove('active');
+      overlay.classList.add('closing');
+      setTimeout(() => overlay.remove(), 400);
+    };
+  }
+})();
+
+// ====== PWA Install Popup (with mobile fallback) ======
 (function(){
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(r => console.log('SW registered')).catch(e => console.log('SW error', e));
   }
 
   let deferredPrompt;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // Skip if already installed or dismissed
+  if (isStandalone || localStorage.getItem('nexus_pwa_dismissed')) return;
+
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
-    if (localStorage.getItem('nexus_pwa_dismissed')) return;
-    // Show popup after a short delay
-    setTimeout(() => showPWAPopup(), 2500);
+    setTimeout(() => showPWAPopup(false), 4000);
   });
 
-  function showPWAPopup() {
-    // Overlay
+  // Fallback for iOS / browsers without beforeinstallprompt
+  if (isMobile && !deferredPrompt) {
+    setTimeout(() => {
+      if (!deferredPrompt && !document.getElementById('pwa-popup-overlay')) {
+        showPWAPopup(true);
+      }
+    }, 5000);
+  }
+
+  function showPWAPopup(isManual) {
+    if (localStorage.getItem('nexus_pwa_dismissed')) return;
+    if (localStorage.getItem('nexus_onboarded') !== '1') return; // Wait for onboarding first
     const overlay = document.createElement('div');
     overlay.id = 'pwa-popup-overlay';
+    const installBtnText = isManual
+      ? (isIOS ? 'How to Install' : 'Install Now')
+      : 'Install Now';
+    const manualInstructions = isIOS
+      ? '<p class="pwa-manual-hint">Tap <strong>Share</strong> → <strong>Add to Home Screen</strong></p>'
+      : '<p class="pwa-manual-hint">Tap <strong>⋮ Menu</strong> → <strong>Install App</strong></p>';
     overlay.innerHTML = `
       <div class="pwa-popup">
         <div class="pwa-popup-glow"></div>
@@ -284,25 +398,26 @@ document.querySelectorAll('.feature-input').forEach(input => {
         </div>
         <button class="pwa-popup-install" id="pwa-popup-install">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Install Now
+          ${installBtnText}
         </button>
+        ${isManual ? manualInstructions : ''}
         <button class="pwa-popup-later" id="pwa-popup-later">Maybe Later</button>
       </div>
     `;
     document.body.appendChild(overlay);
 
-    // Event listeners
     document.getElementById('pwa-popup-install').onclick = () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(() => { closePWAPopup(); deferredPrompt = null; });
+      } else {
+        // Manual — just dismiss and let user follow instructions
+        closePWAPopup();
       }
     };
     document.getElementById('pwa-popup-close').onclick = closePWAPopup;
     document.getElementById('pwa-popup-later').onclick = closePWAPopup;
     overlay.addEventListener('click', e => { if (e.target === overlay) closePWAPopup(); });
-
-    // Animate in
     requestAnimationFrame(() => overlay.classList.add('active'));
   }
 

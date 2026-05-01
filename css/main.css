@@ -506,3 +506,99 @@ body {
     transition: color 0.2s ease;
 }
 .pwa-popup-later:hover { color: var(--text-secondary); }
+.pwa-manual-hint {
+    font-size: 0.78rem; color: var(--text-tertiary); margin-top: 8px;
+    text-align: center; line-height: 1.6;
+}
+.pwa-manual-hint strong { color: var(--text-primary); }
+
+/* ========== ONBOARDING POPUP ========== */
+#onboarding-overlay {
+    position: fixed; inset: 0; z-index: 10001;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+#onboarding-overlay.active { opacity: 1; visibility: visible; }
+#onboarding-overlay.closing { opacity: 0; visibility: hidden; }
+
+.onboarding-popup {
+    position: relative;
+    background: var(--bg-primary); border: 1px solid var(--border);
+    border-radius: 24px; padding: 32px 24px 24px;
+    max-width: 380px; width: 100%;
+    text-align: center; overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    transform: scale(0.85) translateY(30px);
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#onboarding-overlay.active .onboarding-popup { transform: scale(1) translateY(0); }
+#onboarding-overlay.closing .onboarding-popup { transform: scale(0.9) translateY(20px); }
+
+.onboarding-glow {
+    position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+    width: 250px; height: 250px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,108,247,0.2) 0%, transparent 70%);
+    pointer-events: none; animation: pwa-glow-pulse 3s ease-in-out infinite;
+}
+
+.onboarding-step { display: none; animation: onb-step-in 0.4s ease; }
+.onboarding-step.active { display: block; }
+@keyframes onb-step-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+.onb-emoji { font-size: 2.5rem; margin-bottom: 12px; animation: pwa-icon-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both; }
+
+.onboarding-step h3 {
+    font-size: 1.2rem; font-weight: 700; color: var(--text-primary);
+    margin-bottom: 8px;
+}
+.onboarding-step p {
+    font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+.onb-input {
+    width: 100%; padding: 14px 16px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--bg-secondary);
+    color: var(--text-primary); font-family: var(--font-body); font-size: 1rem;
+    outline: none; margin-bottom: 16px; text-align: center;
+    transition: border-color 0.2s ease;
+}
+.onb-input:focus { border-color: var(--accent); }
+.onb-input::placeholder { color: var(--text-tertiary); }
+
+.onb-next {
+    width: 100%; padding: 14px; border: none; border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+    color: white; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(74,108,247,0.35);
+}
+.onb-next:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(74,108,247,0.45); }
+.onb-next:active { transform: translateY(0); }
+
+.onb-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.onb-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--bg-secondary);
+    cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem;
+}
+.onb-option:hover { border-color: var(--accent); }
+.onb-option input[type="radio"] { accent-color: var(--accent); width: 16px; height: 16px; }
+.onb-option input[type="radio"]:checked + span { color: var(--accent); font-weight: 600; }
+
+.onb-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 18px; }
+.onb-chip {
+    padding: 8px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--bg-secondary);
+    color: var(--text-primary); font-family: var(--font-body); font-size: 0.8rem;
+    cursor: pointer; transition: all 0.2s ease;
+}
+.onb-chip:hover { border-color: var(--accent); }
+.onb-chip.selected {
+    background: var(--accent); color: white;
+    border-color: var(--accent); box-shadow: 0 2px 8px rgba(74,108,247,0.3);
+}
