@@ -349,11 +349,11 @@
         display: none !important;
         position: fixed; bottom: 0; left: 0; right: 0;
         width: 100% !important; height: auto; max-height: 70vh;
-        flex-direction: column; z-index: 800;
+        flex-direction: column; z-index: 810;
         border-right: none; border-top: 1px solid var(--border);
         border-radius: 20px 20px 0 0;
         box-shadow: 0 -8px 32px rgba(0,0,0,0.25);
-        padding: 12px 16px 24px;
+        padding: 8px 16px 24px;
         overflow-y: auto;
         background: var(--bg-primary);
         animation: sheet-up 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -361,16 +361,23 @@
     .feature-nav.mobile-open { display: flex !important; }
     @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+    /* Drag handle at top of bottom sheet */
+    .feature-nav::before {
+        content: ''; display: block; width: 36px; height: 4px;
+        background: var(--text-tertiary); border-radius: 4px;
+        margin: 4px auto 12px; opacity: 0.5; flex-shrink: 0;
+    }
+
     .fnav-logo-row { display: none; }
     .fnav-section-label { font-size: 0.6rem; padding: 10px 8px 4px; }
     .fnav-item { height: 44px; font-size: 0.88rem; padding: 0 14px; border-radius: 10px; }
     .fnav-item .fnav-emoji { font-size: 1.1rem; }
     .fnav-footer { padding: 10px 0 0; font-size: 0.6rem; }
 
-    /* Mobile FAB */
+    /* Mobile FAB — changes to ✕ when sheet is open */
     .mobile-features-btn {
         position: fixed; bottom: 80px; right: 16px;
-        width: 50px; height: 50px; border-radius: 50%; z-index: 799;
+        width: 50px; height: 50px; border-radius: 50%; z-index: 820;
         background: var(--accent); color: white; border: none;
         box-shadow: 0 4px 20px rgba(74,108,247,0.4);
         font-size: 1.4rem; cursor: pointer;
@@ -381,13 +388,13 @@
     .mobile-features-btn:active { transform: scale(0.9); }
     @keyframes fab-in { from { transform: scale(0) rotate(-90deg); } to { transform: scale(1) rotate(0); } }
 
-    /* Mobile nav overlay */
+    /* Mobile nav overlay — must be ABOVE content but BELOW sheet and FAB */
     .mobile-nav-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-        z-index: 799; opacity: 0; visibility: hidden;
+        position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+        z-index: 805; opacity: 0; visibility: hidden; pointer-events: none;
         transition: all 0.3s ease; backdrop-filter: blur(3px);
     }
-    .mobile-nav-overlay.active { opacity: 1; visibility: visible; }
+    .mobile-nav-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
     /* Panels container: full width, subtract header height */
     .panels-container {

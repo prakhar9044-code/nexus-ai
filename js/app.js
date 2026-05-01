@@ -146,6 +146,13 @@ const App = (() => {
         function closeMobileNav() {
             featureNav?.classList.remove('mobile-open');
             mobileOverlay?.classList.remove('active');
+            if (mobileBtn) mobileBtn.textContent = '🧭';
+        }
+
+        function openMobileNav() {
+            featureNav?.classList.add('mobile-open');
+            mobileOverlay?.classList.add('active');
+            if (mobileBtn) mobileBtn.textContent = '✕';
         }
 
         document.querySelectorAll('.fnav-item').forEach(item => {
@@ -156,12 +163,16 @@ const App = (() => {
             });
         });
 
-        // Mobile nav toggle
+        // Mobile nav toggle — open/close with icon swap
         mobileBtn?.addEventListener('click', () => {
-            featureNav?.classList.toggle('mobile-open');
-            mobileOverlay?.classList.toggle('active');
-            closeSidebar(); // Close sidebar if open
+            if (featureNav?.classList.contains('mobile-open')) {
+                closeMobileNav();
+            } else {
+                closeSidebar(); // Close sidebar if open
+                openMobileNav();
+            }
         });
+        // Close when tapping dark overlay
         mobileOverlay?.addEventListener('click', closeMobileNav);
 
         // Sidebar toggle with overlay
