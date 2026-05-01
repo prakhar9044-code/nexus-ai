@@ -337,51 +337,56 @@ document.querySelectorAll('.feature-input').forEach(input => {
       // Close
       overlay.classList.remove('active');
       overlay.classList.add('closing');
-      setTimeout(() => overlay.remove(), 400);
+      setTimeout(() => {
+        overlay.remove();
+        // Trigger PWA install popup after onboarding
+        if (window.triggerPWAPopup) window.triggerPWAPopup();
+      }, 400);
     };
   }
 })();
 
-// ====== PWA Install Popup (with mobile fallback) ======
+// ====== PWA Install Popup (reliable mobile fallback) ======
 (function(){
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(r => console.log('SW registered')).catch(e => console.log('SW error', e));
   }
 
-  let deferredPrompt;
+  let deferredPrompt = null;
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // Skip if already installed or dismissed
-  if (isStandalone || localStorage.getItem('nexus_pwa_dismissed')) return;
-
+  // Capture the install prompt if browser fires it
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
-    setTimeout(() => showPWAPopup(false), 4000);
   });
 
-  // Fallback for iOS / browsers without beforeinstallprompt
-  if (isMobile && !deferredPrompt) {
-    setTimeout(() => {
-      if (!deferredPrompt && !document.getElementById('pwa-popup-overlay')) {
-        showPWAPopup(true);
-      }
-    }, 5000);
+  // Global function — called by onboarding when it finishes, or after delay if already onboarded
+  window.triggerPWAPopup = function() {
+    if (isStandalone) return; // Already installed as app
+    if (localStorage.getItem('nexus_pwa_dismissed_v2')) return; // Already dismissed this version
+    if (document.getElementById('pwa-popup-overlay')) return; // Already showing
+    setTimeout(() => showPWAPopup(!deferredPrompt), 1500);
+  };
+
+  // If user was already onboarded from a previous visit, show PWA popup after 4s
+  if (localStorage.getItem('nexus_onboarded') === '1') {
+    setTimeout(() => window.triggerPWAPopup(), 4000);
   }
 
   function showPWAPopup(isManual) {
-    if (localStorage.getItem('nexus_pwa_dismissed')) return;
-    if (localStorage.getItem('nexus_onboarded') !== '1') return; // Wait for onboarding first
     const overlay = document.createElement('div');
     overlay.id = 'pwa-popup-overlay';
     const installBtnText = isManual
       ? (isIOS ? 'How to Install' : 'Install Now')
       : 'Install Now';
-    const manualInstructions = isIOS
-      ? '<p class="pwa-manual-hint">Tap <strong>Share</strong> → <strong>Add to Home Screen</strong></p>'
-      : '<p class="pwa-manual-hint">Tap <strong>⋮ Menu</strong> → <strong>Install App</strong></p>';
+    const hint = isManual
+      ? (isIOS
+        ? '<p class="pwa-manual-hint">Tap <strong>Share ⬆</strong> → <strong>Add to Home Screen</strong></p>'
+        : '<p class="pwa-manual-hint">Tap <strong>⋮ Menu</strong> → <strong>Install App</strong> or <strong>Add to Home Screen</strong></p>')
+      : '';
     overlay.innerHTML = `
       <div class="pwa-popup">
         <div class="pwa-popup-glow"></div>
@@ -400,7 +405,7 @@ document.querySelectorAll('.feature-input').forEach(input => {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           ${installBtnText}
         </button>
-        ${isManual ? manualInstructions : ''}
+        ${hint}
         <button class="pwa-popup-later" id="pwa-popup-later">Maybe Later</button>
       </div>
     `;
@@ -411,7 +416,6 @@ document.querySelectorAll('.feature-input').forEach(input => {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(() => { closePWAPopup(); deferredPrompt = null; });
       } else {
-        // Manual — just dismiss and let user follow instructions
         closePWAPopup();
       }
     };
@@ -426,7 +430,7 @@ document.querySelectorAll('.feature-input').forEach(input => {
     if (!overlay) return;
     overlay.classList.remove('active');
     overlay.classList.add('closing');
-    localStorage.setItem('nexus_pwa_dismissed', '1');
+    localStorage.setItem('nexus_pwa_dismissed_v2', '1');
     setTimeout(() => overlay.remove(), 400);
   }
 })();
