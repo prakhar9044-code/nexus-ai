@@ -10,365 +10,250 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080b14">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/landing.css?v=8">
+<link rel="stylesheet" href="css/landing.css?v=9">
 </head>
 <body>
 
 <!-- NAVBAR -->
 <nav class="nav" id="nav">
-    <div class="nav-inner">
-        <a href="#" class="nav-logo">
-            <img src="assets/logo.png" alt="Nexus" class="nav-logo-img">
-            <span>Nexus <span class="nav-ai">AI</span></span>
-        </a>
-        <div class="nav-links" id="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how">How it works</a>
-            <a href="#stats">Impact</a>
-            <a href="#testimonials">Reviews</a>
-        </div>
-        <div class="nav-actions">
-            <a href="login.html" class="nav-btn nav-btn-ghost">Log in</a>
-            <a href="login.html" class="nav-btn nav-btn-primary">Get Started Free</a>
-        </div>
-        <button class="nav-hamburger" id="nav-hamburger">
-            <span></span><span></span><span></span>
-        </button>
+<div class="nav-inner">
+    <a href="#" class="nav-logo"><img src="assets/logo.png" alt="Nexus" class="nav-logo-img"><span>Nexus <span class="g-text">AI</span></span></a>
+    <div class="nav-links" id="nav-links">
+        <a href="#features">Features</a><a href="#showcase">Showcase</a><a href="#how">How it works</a><a href="#upcoming">Upcoming</a><a href="#testimonials">Reviews</a>
     </div>
+    <div class="nav-actions">
+        <a href="login.html" class="nav-btn nb-ghost">Log in</a>
+        <a href="login.html" class="nav-btn nb-primary">Open Nexus</a>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+</div>
 </nav>
 
-<!-- HERO -->
+<!-- ===== HERO ===== -->
 <section class="hero">
-    <div class="hero-bg">
-        <div class="hero-gradient"></div>
-        <div class="hero-grid"></div>
-        <div class="hero-orb hero-orb-1"></div>
-        <div class="hero-orb hero-orb-2"></div>
-        <div class="hero-orb hero-orb-3"></div>
-        <div class="hero-particles" id="hero-particles"></div>
+<div class="hero-bg"><div class="h-gradient"></div><div class="h-grid"></div>
+<div class="h-orb h-orb1"></div><div class="h-orb h-orb2"></div><div class="h-orb h-orb3"></div>
+<div class="h-particles" id="particles"></div></div>
+<div class="hero-content">
+    <div class="hero-badge anim-up"><span class="badge-pulse"></span>Trusted by 2,500+ students & professionals</div>
+    <h1 class="hero-title anim-up d1">Your AI-Powered<br><span class="g-text">Career Strategist</span></h1>
+    <p class="hero-desc anim-up d2">17+ intelligent features to supercharge your career. Mock interviews, AI teacher,<br>resume builder, skill analysis — all powered by Gemini AI.</p>
+    <div class="hero-ctas anim-up d3">
+        <a href="login.html" class="cta cta-p"><span>Get Started — it's free</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        <a href="#showcase" class="cta cta-s">See it in action</a>
     </div>
-    <div class="hero-content">
-        <div class="hero-badge anim-up">
-            <span class="badge-dot"></span>
-            <span>Trusted by 2,500+ students & professionals</span>
-        </div>
-        <h1 class="hero-title anim-up d1">Your AI-Powered<br><span class="hero-gradient-text">Career Strategist</span></h1>
-        <p class="hero-desc anim-up d2">17+ intelligent features to supercharge your career growth.<br>Mock interviews, AI teacher, resume builder, skill analysis — all in one place.</p>
-        <div class="hero-ctas anim-up d3">
-            <a href="login.html" class="cta cta-primary">
-                <span>Get Started — it's free</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-            <a href="#features" class="cta cta-secondary">
-                <span>See Features</span>
-            </a>
-        </div>
-        <div class="hero-preview anim-up d4">
-            <div class="preview-window">
-                <div class="preview-topbar">
-                    <div class="preview-dots"><span></span><span></span><span></span></div>
-                    <div class="preview-url">nexuspv.netlify.app</div>
-                </div>
-                <div class="preview-body">
-                    <div class="preview-sidebar">
-                        <div class="preview-sb-item active"></div>
-                        <div class="preview-sb-item"></div>
-                        <div class="preview-sb-item"></div>
-                        <div class="preview-sb-item"></div>
-                        <div class="preview-sb-item"></div>
-                    </div>
-                    <div class="preview-chat">
-                        <div class="preview-msg preview-msg-ai">
-                            <div class="preview-msg-avatar">N</div>
-                            <div class="preview-msg-bubble">
-                                <div class="typing-dots"><span></span><span></span><span></span></div>
-                                <span class="preview-msg-text"></span>
-                            </div>
-                        </div>
-                        <div class="preview-msg preview-msg-user">
-                            <div class="preview-msg-bubble">Help me prepare for my interview at Google</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="preview-glow"></div>
+    <div class="hero-avatars-row anim-up d4">
+        <div class="ha-stack"><div class="ha" style="background:#4a6cf7">R</div><div class="ha" style="background:#22c55e">P</div><div class="ha" style="background:#f59e0b">A</div><div class="ha" style="background:#ef4444">S</div><div class="ha" style="background:#a855f7">M</div></div>
+        <span><strong>2,500+</strong> users already leveling up</span>
+    </div>
+</div>
+<div class="hero-mockup anim-up d5">
+<div class="mockup-window">
+    <div class="mockup-bar"><div class="mockup-dots"><i></i><i></i><i></i></div><div class="mockup-url">nexuspv.netlify.app</div></div>
+    <div class="mockup-body">
+        <div class="mockup-side"><div class="ms-i act"></div><div class="ms-i"></div><div class="ms-i"></div><div class="ms-i"></div><div class="ms-i"></div></div>
+        <div class="mockup-chat">
+            <div class="mc-msg mc-user"><div class="mc-b">Help me prepare for my Google interview 🚀</div></div>
+            <div class="mc-msg mc-ai"><div class="mc-av">N</div><div class="mc-b"><span class="mc-typing"><i></i><i></i><i></i></span><span class="mc-text" id="typeText"></span></div></div>
         </div>
     </div>
+</div>
+<div class="mockup-glow"></div>
+<div class="mockup-reflection"></div>
+</div>
+<div class="hero-scroll-hint anim-up d5"><div class="scroll-mouse"><div class="scroll-wheel"></div></div><span>Scroll to explore</span></div>
 </section>
 
-<!-- FEATURES -->
-<section class="features" id="features">
-    <div class="section-inner">
-        <div class="section-badge anim-scroll">✨ Powerful Features</div>
-        <h2 class="section-title anim-scroll">Everything you need to <span class="hero-gradient-text">level up</span></h2>
-        <p class="section-desc anim-scroll">From interview prep to career roadmaps — Nexus AI has you covered.</p>
+<!-- ===== LOGO BAR ===== -->
+<section class="logo-bar"><div class="section-inner">
+<p>Built for students at top universities & professionals worldwide</p>
+<div class="logos"><span>IIT Delhi</span><span>BITS Pilani</span><span>NIT Trichy</span><span>VIT</span><span>DTU</span><span>NSUT</span><span>SRM</span></div>
+</div></section>
 
-        <div class="features-grid">
-            <div class="feature-card anim-scroll" data-delay="0">
-                <div class="fc-icon">🧠</div>
-                <h3>AI Chat Assistant</h3>
-                <p>Get instant, intelligent answers to any career or study question with our Gemini-powered AI.</p>
-            </div>
-            <div class="feature-card anim-scroll" data-delay="1">
-                <div class="fc-icon">🎤</div>
-                <h3>Mock Interview</h3>
-                <p>Practice realistic interviews with AI. Get scored feedback on answers, body language tips & more.</p>
-            </div>
-            <div class="feature-card anim-scroll" data-delay="2">
-                <div class="fc-icon">👨‍🏫</div>
-                <h3>AI Teacher Mode</h3>
-                <p>Learn any topic with a patient, adaptive AI tutor that adjusts to your level automatically.</p>
-            </div>
-            <div class="feature-card anim-scroll" data-delay="3">
-                <div class="fc-icon">📄</div>
-                <h3>Resume Builder</h3>
-                <p>Generate ATS-optimized resumes tailored for specific roles and companies in seconds.</p>
-            </div>
-            <div class="feature-card anim-scroll" data-delay="4">
-                <div class="fc-icon">📊</div>
-                <h3>Skill Analysis</h3>
-                <p>Identify your skill gaps and get personalized recommendations to fill them fast.</p>
-            </div>
-            <div class="feature-card anim-scroll" data-delay="5">
-                <div class="fc-icon">🖼️</div>
-                <h3>Image Generation</h3>
-                <p>Create stunning visuals, diagrams, and study materials with AI-powered image generation.</p>
-            </div>
-            <div class="feature-card anim-scroll" data-delay="6">
-                <div class="fc-icon">🎯</div>
-                <h3>Career Roadmap</h3>
-                <p>Get a step-by-step personalized roadmap to reach your dream role with timelines.</p>
-            </div>
-            <div class="feature-card anim-scroll" data-delay="7">
-                <div class="fc-icon">🏆</div>
-                <h3>Gamified XP System</h3>
-                <p>Earn XP, level up, unlock achievements. Learning has never been this engaging.</p>
-            </div>
-        </div>
+<!-- ===== SHOWCASE SECTIONS (Discord-style alternating) ===== -->
+<section class="showcase" id="showcase">
+
+<div class="show-block">
+<div class="section-inner show-row">
+    <div class="show-text anim-scroll">
+        <div class="show-badge">🧠 AI Chat</div>
+        <h2>Ask anything.<br><span class="g-text">Get brilliant answers.</span></h2>
+        <p>Powered by Gemini AI, Nexus understands your career context and gives personalized, in-depth guidance. Not generic answers — real strategy.</p>
+        <ul class="show-list"><li>💬 Context-aware conversations</li><li>📎 Attach files & documents</li><li>🎙️ Voice input support</li><li>🖼️ AI image generation</li></ul>
     </div>
+    <div class="show-visual anim-scroll"><div class="sv-card sv-chat"><div class="sv-msg sv-ai"><div class="sv-av">N</div><div class="sv-bub">I'll create a personalized 6-month roadmap for your Full-Stack Developer goal. Let's start! 🚀</div></div><div class="sv-msg sv-usr"><div class="sv-bub">That sounds amazing!</div></div><div class="sv-msg sv-ai"><div class="sv-av">N</div><div class="sv-bub">Month 1: HTML, CSS, JavaScript fundamentals...<br>Month 2: React.js deep dive...</div></div></div></div>
+</div>
+</div>
+
+<div class="show-block show-alt">
+<div class="section-inner show-row show-row-rev">
+    <div class="show-text anim-scroll">
+        <div class="show-badge">🎤 Mock Interview</div>
+        <h2>Practice interviews.<br><span class="g-text">Land your dream job.</span></h2>
+        <p>AI-powered mock interviews tailored for your target role and company. Get real-time feedback, scoring, and improvement tips after every session.</p>
+        <ul class="show-list"><li>🎯 Company-specific questions</li><li>📊 Performance scoring</li><li>💡 Detailed feedback</li><li>🔄 Unlimited retries</li></ul>
+    </div>
+    <div class="show-visual anim-scroll"><div class="sv-card sv-interview"><div class="sv-score"><div class="sv-score-ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/><circle cx="50" cy="50" r="40" fill="none" stroke="url(#grad)" stroke-width="8" stroke-dasharray="226" stroke-dashoffset="34" stroke-linecap="round" transform="rotate(-90 50 50)"/><defs><linearGradient id="grad"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#22c55e"/></linearGradient></defs></svg><span>87%</span></div><div>Interview Score</div></div><div class="sv-feedback"><div class="sv-fb-item good">✅ Strong technical answers</div><div class="sv-fb-item good">✅ Clear communication</div><div class="sv-fb-item warn">⚠️ Add more examples</div></div></div></div>
+</div>
+</div>
+
+<div class="show-block">
+<div class="section-inner show-row">
+    <div class="show-text anim-scroll">
+        <div class="show-badge">👨‍🏫 AI Teacher</div>
+        <h2>Learn anything.<br><span class="g-text">At your own pace.</span></h2>
+        <p>An adaptive AI tutor that adjusts to your skill level. From DSA to system design, learn with patience and clarity that adapts to YOU.</p>
+        <ul class="show-list"><li>📖 Adaptive difficulty</li><li>🧪 Interactive quizzes</li><li>📝 Step-by-step explanations</li><li>🏆 XP for every lesson</li></ul>
+    </div>
+    <div class="show-visual anim-scroll"><div class="sv-card sv-teacher"><div class="sv-lesson"><div class="sv-lesson-title">📘 Binary Search Trees</div><div class="sv-progress"><div class="sv-progress-fill" style="width:72%"></div></div><div class="sv-progress-label">72% Complete</div></div><div class="sv-xp-toast">+15 XP earned! 🎉</div></div></div>
+</div>
+</div>
+
+<div class="show-block show-alt">
+<div class="section-inner show-row show-row-rev">
+    <div class="show-text anim-scroll">
+        <div class="show-badge">🏆 Gamified XP System</div>
+        <h2>Learn. Earn. <br><span class="g-text">Level up.</span></h2>
+        <p>Every action earns XP. Level up from Beginner to Legend. Unlock achievements, maintain streaks, and compete with yourself.</p>
+        <ul class="show-list"><li>⚡ Auto XP for every activity</li><li>🔥 Daily streak tracking</li><li>🏅 Achievement badges</li><li>📈 Progress dashboard</li></ul>
+    </div>
+    <div class="show-visual anim-scroll"><div class="sv-card sv-xp"><div class="sv-level"><div class="sv-level-icon">⚡</div><div><div class="sv-level-name">Level 3 — Pro</div><div class="sv-level-xp">750 / 1000 XP</div></div></div><div class="sv-xp-bar"><div class="sv-xp-fill"></div></div><div class="sv-achievements"><div class="sv-ach">🔥 7-Day Streak</div><div class="sv-ach">🎯 First Interview</div><div class="sv-ach">📄 Resume Built</div></div></div></div>
+</div>
+</div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how-section" id="how">
-    <div class="section-inner">
-        <div class="section-badge anim-scroll">🚀 Simple & Powerful</div>
-        <h2 class="section-title anim-scroll">Get started in <span class="hero-gradient-text">3 steps</span></h2>
-
-        <div class="steps">
-            <div class="step anim-scroll">
-                <div class="step-num">01</div>
-                <div class="step-content">
-                    <h3>Create your account</h3>
-                    <p>Sign up with Google, GitHub, phone or email in seconds. No credit card needed.</p>
-                </div>
-                <div class="step-visual">🔐</div>
-            </div>
-            <div class="step-connector anim-scroll"></div>
-            <div class="step anim-scroll">
-                <div class="step-num">02</div>
-                <div class="step-content">
-                    <h3>Tell Nexus your goals</h3>
-                    <p>Share your career interests, current skills, and dream role. AI personalizes everything.</p>
-                </div>
-                <div class="step-visual">🎯</div>
-            </div>
-            <div class="step-connector anim-scroll"></div>
-            <div class="step anim-scroll">
-                <div class="step-num">03</div>
-                <div class="step-content">
-                    <h3>Start growing</h3>
-                    <p>Access all 17+ features. Practice interviews, build resumes, learn with AI — all free.</p>
-                </div>
-                <div class="step-visual">🚀</div>
-            </div>
-        </div>
+<!-- ===== FEATURES GRID ===== -->
+<section class="features-sec" id="features">
+<div class="section-inner center">
+    <div class="sec-badge anim-scroll">✨ All Features</div>
+    <h2 class="sec-title anim-scroll">17+ features, <span class="g-text">one platform</span></h2>
+    <p class="sec-desc anim-scroll">Everything you need for your career journey.</p>
+    <div class="feat-grid">
+        <div class="fc anim-scroll"><div class="fc-i">🧠</div><h3>AI Chat</h3><p>Smart career guidance</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">🎤</div><h3>Mock Interview</h3><p>Practice & get scored</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">👨‍🏫</div><h3>AI Teacher</h3><p>Learn any topic</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">📄</div><h3>Resume Builder</h3><p>ATS-optimized</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">📊</div><h3>Skill Analysis</h3><p>Find your gaps</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">🎯</div><h3>Career Path</h3><p>Personalized roadmap</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">📈</div><h3>Job Market</h3><p>Trends & insights</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">🖼️</div><h3>Image Gen</h3><p>AI-powered visuals</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">💻</div><h3>Code Practice</h3><p>LeetCode-style</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">📅</div><h3>Roadmap</h3><p>Timeline planner</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">🏆</div><h3>XP System</h3><p>Gamified learning</p></div>
+        <div class="fc anim-scroll"><div class="fc-i">🔔</div><h3>Notifications</h3><p>Push alerts</p></div>
     </div>
+</div>
 </section>
 
-<!-- STATS -->
-<section class="stats-section" id="stats">
-    <div class="section-inner">
-        <div class="stats-grid">
-            <div class="stat anim-scroll">
-                <div class="stat-num" data-target="2500">0</div>
-                <div class="stat-label">Active Users</div>
-            </div>
-            <div class="stat anim-scroll">
-                <div class="stat-num" data-target="17">0</div>
-                <div class="stat-label">AI Features</div>
-            </div>
-            <div class="stat anim-scroll">
-                <div class="stat-num" data-target="50000">0</div>
-                <div class="stat-label">Conversations</div>
-            </div>
-            <div class="stat anim-scroll">
-                <div class="stat-num" data-target="98">0</div>
-                <div class="stat-label">% Satisfaction</div>
-            </div>
-        </div>
+<!-- ===== HOW IT WORKS ===== -->
+<section class="how-sec" id="how">
+<div class="section-inner center">
+    <div class="sec-badge anim-scroll">🚀 Get Started</div>
+    <h2 class="sec-title anim-scroll">Up and running in <span class="g-text">30 seconds</span></h2>
+    <div class="steps">
+        <div class="step anim-scroll"><div class="step-n">1</div><div class="step-c"><h3>Create account</h3><p>Google, GitHub, phone or email — your choice.</p></div><div class="step-e">🔐</div></div>
+        <div class="step-line anim-scroll"></div>
+        <div class="step anim-scroll"><div class="step-n">2</div><div class="step-c"><h3>Set your goals</h3><p>Tell Nexus your dream role. AI personalizes everything.</p></div><div class="step-e">🎯</div></div>
+        <div class="step-line anim-scroll"></div>
+        <div class="step anim-scroll"><div class="step-n">3</div><div class="step-c"><h3>Level up</h3><p>Practice, learn, build — earn XP and watch yourself grow.</p></div><div class="step-e">🚀</div></div>
     </div>
+</div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section class="testimonials" id="testimonials">
-    <div class="section-inner">
-        <div class="section-badge anim-scroll">💬 What Users Say</div>
-        <h2 class="section-title anim-scroll">Loved by <span class="hero-gradient-text">students & professionals</span></h2>
-
-        <div class="testimonial-grid">
-            <div class="testimonial-card anim-scroll">
-                <div class="tc-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Nexus AI helped me crack my dream job at Google. The mock interview feature is insanely good!"</p>
-                <div class="tc-author"><div class="tc-avatar" style="background:#4a6cf7">R</div><div><strong>Rahul S.</strong><span>Software Engineer at Google</span></div></div>
-            </div>
-            <div class="testimonial-card anim-scroll">
-                <div class="tc-stars">⭐⭐⭐⭐⭐</div>
-                <p>"The AI Teacher mode helped me learn DSA in 2 months. It adapts to exactly my level. Incredible."</p>
-                <div class="tc-author"><div class="tc-avatar" style="background:#22c55e">P</div><div><strong>Priya M.</strong><span>CSE Student, IIT Delhi</span></div></div>
-            </div>
-            <div class="testimonial-card anim-scroll">
-                <div class="tc-stars">⭐⭐⭐⭐⭐</div>
-                <p>"Built my entire resume in 5 minutes. Got 3 interview calls the same week. This tool is magic."</p>
-                <div class="tc-author"><div class="tc-avatar" style="background:#f59e0b">A</div><div><strong>Anika K.</strong><span>Product Manager, Flipkart</span></div></div>
-            </div>
-        </div>
-    </div>
+<!-- ===== STATS ===== -->
+<section class="stats-sec">
+<div class="section-inner"><div class="stats-row">
+    <div class="stat anim-scroll"><div class="stat-n" data-target="2500">0</div><div class="stat-l">Active Users</div></div>
+    <div class="stat anim-scroll"><div class="stat-n" data-target="17">0</div><div class="stat-l">AI Features</div></div>
+    <div class="stat anim-scroll"><div class="stat-n" data-target="50000">0</div><div class="stat-l">Conversations</div></div>
+    <div class="stat anim-scroll"><div class="stat-n" data-target="98">0</div><div class="stat-l">% Satisfaction</div></div>
+</div></div>
 </section>
 
-<!-- FINAL CTA -->
+<!-- ===== UPCOMING ===== -->
+<section class="upcoming-sec" id="upcoming">
+<div class="section-inner center">
+    <div class="sec-badge anim-scroll">🔮 Coming Soon</div>
+    <h2 class="sec-title anim-scroll">The future of <span class="g-text">Nexus AI</span></h2>
+    <p class="sec-desc anim-scroll">We're building the most powerful AI career platform. Here's what's next.</p>
+    <div class="upcoming-grid">
+        <div class="up-card anim-scroll"><div class="up-status">Q3 2026</div><div class="up-icon">🤝</div><h3>Real-Time Collaboration</h3><p>Study rooms, peer interviews, and group learning sessions with AI moderation.</p></div>
+        <div class="up-card anim-scroll"><div class="up-status">Q3 2026</div><div class="up-icon">📱</div><h3>Native Mobile App</h3><p>Full-featured iOS & Android apps with offline support and push notifications.</p></div>
+        <div class="up-card anim-scroll"><div class="up-status">Q4 2026</div><div class="up-icon">🎥</div><h3>Video Mock Interviews</h3><p>Practice with AI using your camera. Get body language & communication feedback.</p></div>
+        <div class="up-card anim-scroll"><div class="up-status">Q4 2026</div><div class="up-icon">🧩</div><h3>Plugin Marketplace</h3><p>Community-built plugins for DSA visualizers, portfolio builders, and more.</p></div>
+        <div class="up-card anim-scroll"><div class="up-status">2027</div><div class="up-icon">🌍</div><h3>Multi-Language Support</h3><p>Full localization in Hindi, Spanish, French, German, and 10+ more languages.</p></div>
+        <div class="up-card anim-scroll"><div class="up-status">2027</div><div class="up-icon">🏢</div><h3>Enterprise Edition</h3><p>Team dashboards, HR integrations, and bulk onboarding for companies.</p></div>
+    </div>
+</div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="test-sec" id="testimonials">
+<div class="section-inner center">
+    <div class="sec-badge anim-scroll">💬 Reviews</div>
+    <h2 class="sec-title anim-scroll">Loved by <span class="g-text">thousands</span></h2>
+    <div class="test-grid">
+        <div class="tc anim-scroll"><div class="tc-stars">⭐⭐⭐⭐⭐</div><p>"Nexus AI helped me crack my dream job at Google. The mock interview feature is insanely good!"</p><div class="tc-author"><div class="tc-av" style="background:#4a6cf7">R</div><div><strong>Rahul S.</strong><span>SWE at Google</span></div></div></div>
+        <div class="tc anim-scroll"><div class="tc-stars">⭐⭐⭐⭐⭐</div><p>"The AI Teacher helped me learn DSA in 2 months. Adapts to my exact level. Incredible tool."</p><div class="tc-author"><div class="tc-av" style="background:#22c55e">P</div><div><strong>Priya M.</strong><span>CSE, IIT Delhi</span></div></div></div>
+        <div class="tc anim-scroll"><div class="tc-stars">⭐⭐⭐⭐⭐</div><p>"Built my resume in 5 minutes. Got 3 interview calls same week. This tool is pure magic."</p><div class="tc-author"><div class="tc-av" style="background:#f59e0b">A</div><div><strong>Anika K.</strong><span>PM at Flipkart</span></div></div></div>
+        <div class="tc anim-scroll"><div class="tc-stars">⭐⭐⭐⭐⭐</div><p>"The gamification keeps me coming back daily. Already on a 30-day streak. Can't stop learning!"</p><div class="tc-author"><div class="tc-av" style="background:#a855f7">V</div><div><strong>Vikram J.</strong><span>3rd Year, BITS</span></div></div></div>
+    </div>
+</div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
 <section class="final-cta">
-    <div class="section-inner">
-        <div class="cta-card anim-scroll">
-            <h2>Ready to transform your career?</h2>
-            <p>Join 2,500+ users who are already leveling up with Nexus AI. It's completely free.</p>
-            <a href="login.html" class="cta cta-primary cta-lg">
-                <span>Get Started Free</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-        </div>
+<div class="section-inner center">
+    <div class="cta-block anim-scroll">
+        <div class="cta-block-bg"></div>
+        <h2>Ready to transform your career?</h2>
+        <p>Join thousands of students and professionals already leveling up with Nexus AI. Completely free, no credit card.</p>
+        <a href="login.html" class="cta cta-p cta-big"><span>Get Started Free</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
     </div>
+</div>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
-    <div class="section-inner">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <img src="assets/logo.png" alt="Nexus" class="footer-logo">
-                <span>Nexus AI</span>
-                <p>Your AI-powered career strategist & study assistant.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Product</h4>
-                <a href="#features">Features</a>
-                <a href="#how">How it works</a>
-                <a href="login.html">Get Started</a>
-            </div>
-            <div class="footer-col">
-                <h4>Features</h4>
-                <a href="login.html">AI Chat</a>
-                <a href="login.html">Mock Interview</a>
-                <a href="login.html">Resume Builder</a>
-                <a href="login.html">AI Teacher</a>
-            </div>
-            <div class="footer-col">
-                <h4>Connect</h4>
-                <a href="https://github.com/prakhar9044-code" target="_blank">GitHub</a>
-                <a href="#">LinkedIn</a>
-                <a href="#">Twitter</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 Nexus AI. Built with ❤️ by <strong>Prakhar</strong></p>
-        </div>
+<div class="section-inner">
+    <div class="f-top">
+        <div class="f-brand"><img src="assets/logo.png" alt="Nexus" class="f-logo"><span>Nexus AI</span><p>Your AI-powered career strategist & study assistant.</p></div>
+        <div class="f-col"><h4>Product</h4><a href="#features">Features</a><a href="#how">How it works</a><a href="#upcoming">Upcoming</a><a href="login.html">Get Started</a></div>
+        <div class="f-col"><h4>Features</h4><a href="login.html">AI Chat</a><a href="login.html">Mock Interview</a><a href="login.html">Resume Builder</a><a href="login.html">AI Teacher</a></div>
+        <div class="f-col"><h4>Connect</h4><a href="https://github.com/prakhar9044-code" target="_blank">GitHub</a><a href="#">LinkedIn</a><a href="#">Twitter</a></div>
     </div>
+    <div class="f-bottom"><p>© 2026 Nexus AI. Built with ❤️ by <strong>Prakhar</strong></p></div>
+</div>
 </footer>
 
 <script>
-// Navbar scroll effect
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 40);
-});
-
-// Mobile menu
-document.getElementById('nav-hamburger').addEventListener('click', function() {
-    document.getElementById('nav-links').classList.toggle('open');
-    this.classList.toggle('open');
-});
-
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-        e.preventDefault();
-        const t = document.querySelector(a.getAttribute('href'));
-        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.getElementById('nav-links').classList.remove('open');
-        document.getElementById('nav-hamburger').classList.remove('open');
-    });
-});
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
+document.getElementById('hamburger').addEventListener('click',function(){document.getElementById('nav-links').classList.toggle('open');this.classList.toggle('open');});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});document.getElementById('nav-links').classList.remove('open');document.getElementById('hamburger').classList.remove('open');});});
 
 // Scroll animations
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const delay = entry.target.dataset.delay || 0;
-            setTimeout(() => entry.target.classList.add('visible'), delay * 100);
-        }
-    });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('.anim-scroll').forEach(el => observer.observe(el));
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const d=e.target.dataset.delay||0;setTimeout(()=>e.target.classList.add('visible'),d*80);}});},{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.anim-scroll').forEach(el=>obs.observe(el));
 
-// Counter animation
-const counterObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const el = entry.target;
-            const target = parseInt(el.dataset.target);
-            let current = 0;
-            const step = Math.ceil(target / 60);
-            const timer = setInterval(() => {
-                current += step;
-                if (current >= target) { current = target; clearInterval(timer); }
-                el.textContent = current >= 1000 ? (current/1000).toFixed(1) + 'K+' : current + (target === 98 ? '%' : '+');
-            }, 25);
-            counterObserver.unobserve(el);
-        }
-    });
-}, { threshold: 0.5 });
-document.querySelectorAll('.stat-num').forEach(el => counterObserver.observe(el));
+// Counters
+const cObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const el=e.target,t=+el.dataset.target;let c=0;const s=Math.ceil(t/60);const tm=setInterval(()=>{c+=s;if(c>=t){c=t;clearInterval(tm);}el.textContent=c>=1000?(c/1000).toFixed(1)+'K+':c+(t===98?'%':'+');},25);cObs.unobserve(el);}});},{threshold:0.5});
+document.querySelectorAll('.stat-n').forEach(el=>cObs.observe(el));
 
-// Typing animation in preview
-const texts = ["I'll help you prepare for your Google interview! Let's start with common behavioral questions...", "Here's your personalized career roadmap for Full-Stack Development...", "Your resume has been optimized for ATS compatibility. Score: 94/100 ✅"];
-let textIdx = 0, charIdx = 0;
-const typeEl = document.querySelector('.preview-msg-text');
-const dotsEl = document.querySelector('.typing-dots');
-function typeText() {
-    if (!typeEl) return;
-    if (charIdx === 0) { dotsEl.style.display = 'inline-flex'; typeEl.textContent = ''; }
-    setTimeout(() => {
-        dotsEl.style.display = 'none';
-        const text = texts[textIdx];
-        if (charIdx < text.length) {
-            typeEl.textContent += text[charIdx++];
-            setTimeout(typeText, 22);
-        } else {
-            setTimeout(() => { charIdx = 0; textIdx = (textIdx + 1) % texts.length; typeText(); }, 3000);
-        }
-    }, charIdx === 0 ? 1200 : 0);
-}
-setTimeout(typeText, 2000);
+// Hero typing
+const texts=["I'll help you prepare for your Google interview! Let's start with behavioral questions...","Here's your personalized 6-month Full-Stack Developer roadmap...","Your resume score: 94/100 ✅ Optimized for ATS compatibility!"];
+let ti=0,ci=0;const te=document.getElementById('typeText'),td=document.querySelector('.mc-typing');
+function typeIt(){if(!te)return;if(!ci){td.style.display='inline-flex';te.textContent='';}
+setTimeout(()=>{td.style.display='none';const t=texts[ti];if(ci<t.length){te.textContent+=t[ci++];setTimeout(typeIt,20);}else{setTimeout(()=>{ci=0;ti=(ti+1)%texts.length;typeIt();},3000);}},ci===0?1000:0);}
+setTimeout(typeIt,2000);
 
-// Floating particles
-const pc = document.getElementById('hero-particles');
-if (pc) {
-    for (let i = 0; i < 20; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${4+Math.random()*6}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;`;
-        pc.appendChild(p);
-    }
-}
+// Particles
+const pc=document.getElementById('particles');
+if(pc)for(let i=0;i<25;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${4+Math.random()*6}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;`;pc.appendChild(p);}
+
+// XP bar animation
+const xpObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.querySelector('.sv-xp-fill')?.style.setProperty('width','75%');xpObs.unobserve(e.target);}});},{threshold:0.5});
+document.querySelectorAll('.sv-xp').forEach(el=>xpObs.observe(el));
 </script>
 </body>
 </html>

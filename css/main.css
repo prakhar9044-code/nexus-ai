@@ -699,13 +699,17 @@ body {
 }
 .fnav-collapse-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
 
-.feature-nav { position: relative; }
+.feature-nav { position: relative; transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease; }
 .feature-nav.collapsed {
     width: 0 !important; min-width: 0 !important;
-    overflow: hidden; padding: 0; border: none;
+    padding: 0; border: none;
+    overflow: visible;
+}
+.feature-nav.collapsed > *:not(.fnav-collapse-btn) {
+    opacity: 0; pointer-events: none; overflow: hidden; height: 0; margin: 0; padding: 0;
 }
 .feature-nav.collapsed .fnav-collapse-btn {
-    right: -28px;
+    right: -32px; z-index: 20;
 }
 
 /* ====== Mobile Deep Fixes ====== */
