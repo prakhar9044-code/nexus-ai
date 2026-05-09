@@ -12,14 +12,16 @@ const Toast = (() => {
     return { show };
 })();
 
-// Premium Notification System
+// Premium Notification System + Push Notifications
 const Notify = (() => {
     let notifications = JSON.parse(localStorage.getItem('nexus_notifs') || '[]');
     let badge = null;
+    let pushPermission = 'default';
 
     function init() {
         badge = document.getElementById('notif-badge');
         updateBadge();
+        requestPushPermission();
 
         // Notification bell toggle
         document.getElementById('notif-bell')?.addEventListener('click', (e) => {
@@ -54,10 +56,62 @@ const Notify = (() => {
         });
     }
 
-    function add(type, title, desc, icon) {
+    // Request push notification permission
+    async function requestPushPermission() {
+        if (!('Notification' in window)) return;
+        if (Notification.permission === 'granted') {
+            pushPermission = 'granted';
+            return;
+        }
+        if (Notification.permission === 'denied') {
+            pushPermission = 'denied';
+            return;
+        }
+        // Show a nice prompt first (delayed so it's not annoying)
+        setTimeout(async () => {
+            const result = await Notification.requestPermission();
+            pushPermission = result;
+            if (result === 'granted') {
+                Toast.show('🔔 Notifications enabled! You\'ll get alerts on your phone.', 'success');
+                sendPush('Welcome to Nexus! 🚀', 'You\'ll now receive activity alerts on your phone.', '👋');
+            }
+        }, 3000);
+    }
+
+    // Send native push notification via service worker
+    async function sendPush(title, body, icon, tag, url) {
+        if (pushPermission !== 'granted') return;
+
+        try {
+            const reg = await navigator.serviceWorker?.ready;
+            if (reg) {
+                reg.active.postMessage({
+                    type: 'SHOW_NOTIFICATION',
+                    title: `${icon || '🔔'} ${title}`,
+                    body,
+                    icon: '/assets/icon-192.png',
+                    tag: tag || 'nexus-' + Date.now(),
+                    url: url || '/'
+                });
+            }
+        } catch (err) {
+            // Fallback to basic Notification API
+            try {
+                new Notification(`${icon || '🔔'} ${title}`, {
+                    body,
+                    icon: '/assets/icon-192.png',
+                    badge: '/assets/icon-192.png',
+                    vibrate: [100, 50, 100],
+                    tag: tag || 'nexus-' + Date.now()
+                });
+            } catch (e) {}
+        }
+    }
+
+    function add(type, title, desc, icon, sendSystemNotif = false) {
         const notif = {
             id: Date.now(),
-            type, // 'xp', 'milestone', 'streak', 'info'
+            type,
             icon: icon || getDefaultIcon(type),
             title, desc,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -74,13 +128,18 @@ const Notify = (() => {
         void bell?.offsetWidth;
         bell?.classList.add('has-notifs');
 
-        // Also show toast
+        // Show toast
         const toastType = type === 'xp' ? 'xp' : type === 'milestone' ? 'warning' : type === 'streak' ? 'error' : 'info';
         Toast.show(`${icon || notif.icon} ${title}`, toastType);
 
+        // Send native push notification for important events
+        if (sendSystemNotif || type === 'milestone' || type === 'streak') {
+            sendPush(title, desc, icon, `nexus-${type}-${Date.now()}`);
+        }
+
         // Log to Firestore activity
-        if (typeof DB !== 'undefined' && DB.saveUserProfile) {
-            db.collection('users').doc(auth.currentUser?.uid).collection('activity').add({
+        if (typeof DB !== 'undefined' && auth?.currentUser?.uid) {
+            db.collection('users').doc(auth.currentUser.uid).collection('activity').add({
                 type, title, desc,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).catch(() => {});
@@ -99,7 +158,8 @@ const Notify = (() => {
         document.getElementById('achievement-desc').textContent = desc;
         document.getElementById('achievement-xp').textContent = `+${xp} XP`;
         document.getElementById('achievement-overlay')?.classList.add('active');
-        add('milestone', title, desc, icon);
+        // This is important — always send push for achievements
+        add('milestone', title, desc, icon, true);
     }
 
     function renderList() {
@@ -139,7 +199,7 @@ const Notify = (() => {
         localStorage.setItem('nexus_notifs', JSON.stringify(notifications));
     }
 
-    return { init, add, showAchievement };
+    return { init, add, showAchievement, sendPush };
 })();
 
 // Document generation helper
