@@ -688,16 +688,16 @@ body {
 
 /* ====== Feature Nav Collapse (Desktop) ====== */
 .fnav-collapse-btn {
-    position: absolute; top: 50%; right: -12px; z-index: 10;
-    width: 24px; height: 24px; border-radius: 50%;
+    position: absolute; top: 50%; right: -14px; z-index: 30;
+    width: 28px; height: 28px; border-radius: 50%;
     background: var(--bg-primary); border: 1px solid var(--border);
-    color: var(--text-secondary); cursor: pointer; font-size: 0.75rem;
+    color: var(--text-secondary); cursor: pointer; font-size: 0.85rem;
     display: flex; align-items: center; justify-content: center;
     transform: translateY(-50%);
-    transition: all 0.2s;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.25s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
-.fnav-collapse-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.fnav-collapse-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(-50%) scale(1.15); }
 
 .feature-nav { position: relative; transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease; }
 .feature-nav.collapsed {
@@ -709,7 +709,20 @@ body {
     opacity: 0; pointer-events: none; overflow: hidden; height: 0; margin: 0; padding: 0;
 }
 .feature-nav.collapsed .fnav-collapse-btn {
-    right: -32px; z-index: 20;
+    right: -44px; z-index: 30;
+    width: 36px; height: 36px; font-size: 1.1rem;
+    background: var(--accent); color: white; border-color: var(--accent);
+    box-shadow: 0 2px 16px rgba(74,108,247,0.4);
+    animation: expand-pulse 2s ease-in-out infinite;
+}
+.feature-nav.collapsed .fnav-collapse-btn:hover {
+    animation: none;
+    transform: translateY(-50%) scale(1.2);
+    box-shadow: 0 4px 24px rgba(74,108,247,0.6);
+}
+@keyframes expand-pulse {
+    0%, 100% { box-shadow: 0 2px 16px rgba(74,108,247,0.4); }
+    50% { box-shadow: 0 2px 24px rgba(74,108,247,0.7); }
 }
 
 /* ====== Mobile Deep Fixes ====== */
