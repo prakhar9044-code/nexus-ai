@@ -203,9 +203,25 @@ const Features = (() => {
         DB.updateXP(amount, reason).catch(() => {});
         const lb = getLevel(before), la = getLevel(after);
         if (la.level > lb.level) {
-            Toast.show(`🎉 LEVEL UP! You're now ${la.name}! ${la.icon}`, 'success');
+            // Full achievement popup for level up!
+            if (typeof Notify !== 'undefined') {
+                Notify.showAchievement(la.icon, `Level Up: ${la.name}!`, `You've reached Level ${la.level}. Amazing progress!`, amount);
+            } else {
+                Toast.show(`🎉 LEVEL UP! You're now ${la.name}! ${la.icon}`, 'success');
+            }
         } else {
-            Toast.show(`+${amount} XP earned! ✨`, 'success');
+            // XP notification in bell
+            if (typeof Notify !== 'undefined') {
+                Notify.add('xp', `+${amount} XP earned!`, reason, '✨');
+            }
+        }
+        // Milestone achievements
+        const milestones = [100, 250, 500, 1000, 2000, 5000];
+        for (const m of milestones) {
+            if (before < m && after >= m && typeof Notify !== 'undefined') {
+                Notify.showAchievement('🌟', `${m} XP Milestone!`, `You've earned ${m} total XP. Incredible dedication!`, m);
+                break;
+            }
         }
         return after;
     }

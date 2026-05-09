@@ -33,10 +33,11 @@
         <h1 class="login-title">Welcome to <span class="gradient-text">Nexus</span></h1>
         <p class="login-subtitle">Your AI-powered career & study platform</p>
 
-        <!-- Tab Switcher -->
-        <div class="auth-tabs">
+        <!-- Tab Switcher (3 tabs) -->
+        <div class="auth-tabs auth-tabs-3">
             <button class="auth-tab active" id="tab-login" data-tab="login">Log In</button>
             <button class="auth-tab" id="tab-signup" data-tab="signup">Sign Up</button>
+            <button class="auth-tab" id="tab-phone" data-tab="phone">📱 Phone</button>
             <div class="auth-tab-indicator" id="tab-indicator"></div>
         </div>
 
@@ -73,6 +74,11 @@
                 <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </div>
             <div class="input-group">
+                <input type="tel" id="signup-phone" autocomplete="tel" placeholder=" ">
+                <label for="signup-phone">Phone number (with +91)</label>
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div class="input-group">
                 <input type="password" id="signup-password" required minlength="6" autocomplete="new-password">
                 <label for="signup-password">Password (min 6 chars)</label>
                 <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -82,6 +88,41 @@
                 <span class="btn-text">Create Account</span>
                 <div class="btn-loader"></div>
             </button>
+        </form>
+
+        <!-- Phone Login Form -->
+        <form class="auth-form" id="form-phone">
+            <div class="phone-step active" id="phone-step-1">
+                <div class="phone-hero">📱</div>
+                <p class="phone-desc">We'll send a one-time verification code to your phone number</p>
+                <div class="input-group">
+                    <input type="tel" id="phone-number" required placeholder=" " autocomplete="tel">
+                    <label for="phone-number">Phone number (e.g. +91 98765...)</label>
+                    <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <div id="recaptcha-container"></div>
+                <button type="button" class="auth-btn primary-btn" id="phone-send-otp">
+                    <span class="btn-text">Send OTP</span>
+                    <div class="btn-loader"></div>
+                </button>
+            </div>
+            <div class="phone-step" id="phone-step-2">
+                <div class="phone-hero">🔐</div>
+                <p class="phone-desc">Enter the 6-digit code sent to <strong id="phone-display"></strong></p>
+                <div class="otp-inputs" id="otp-inputs">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-box" inputmode="numeric" pattern="[0-9]">
+                </div>
+                <button type="button" class="auth-btn primary-btn" id="phone-verify-otp">
+                    <span class="btn-text">Verify & Sign In</span>
+                    <div class="btn-loader"></div>
+                </button>
+                <button type="button" class="forgot-link" id="phone-resend" style="margin-top:12px;display:block;text-align:center;border:none;background:none;cursor:pointer;width:100%;">Resend code</button>
+            </div>
         </form>
 
         <!-- Divider -->
@@ -109,7 +150,7 @@
     </div>
 </div>
 
-<!-- Firebase SDK (compat for non-module env) -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -121,10 +162,11 @@ auth.onAuthStateChanged(user => {
     if (user) window.location.href = 'index.html';
 });
 
-// Tab switching
+// Tab switching (3 tabs)
 const tabs = document.querySelectorAll('.auth-tab');
 const forms = document.querySelectorAll('.auth-form');
 const indicator = document.getElementById('tab-indicator');
+const tabMap = { login: 0, signup: 1, phone: 2 };
 
 tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -133,12 +175,12 @@ tabs.forEach(tab => {
         tab.classList.add('active');
         forms.forEach(f => f.classList.remove('active'));
         document.getElementById('form-' + target).classList.add('active');
-        indicator.style.transform = target === 'signup' ? 'translateX(100%)' : 'translateX(0)';
+        indicator.style.transform = `translateX(${tabMap[target] * 100}%)`;
         clearMessage();
     });
 });
 
-// Password toggle
+// Password toggles
 document.getElementById('login-pw-toggle').addEventListener('click', () => {
     const inp = document.getElementById('login-password');
     inp.type = inp.type === 'password' ? 'text' : 'password';
@@ -148,7 +190,25 @@ document.getElementById('signup-pw-toggle').addEventListener('click', () => {
     inp.type = inp.type === 'password' ? 'text' : 'password';
 });
 
-// Show message
+// OTP input auto-focus
+const otpBoxes = document.querySelectorAll('.otp-box');
+otpBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+        if (box.value && i < otpBoxes.length - 1) otpBoxes[i + 1].focus();
+    });
+    box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && i > 0) otpBoxes[i - 1].focus();
+    });
+    box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text').trim();
+        if (/^\d{6}$/.test(paste)) {
+            otpBoxes.forEach((b, j) => { b.value = paste[j] || ''; });
+            otpBoxes[5].focus();
+        }
+    });
+});
+
 function showMessage(text, type = 'error') {
     const el = document.getElementById('auth-message');
     el.textContent = text;
@@ -157,17 +217,10 @@ function showMessage(text, type = 'error') {
     if (type === 'error') el.classList.add('shake');
     setTimeout(() => el.classList.remove('shake'), 500);
 }
-function clearMessage() {
-    const el = document.getElementById('auth-message');
-    el.classList.remove('show');
-}
+function clearMessage() { document.getElementById('auth-message').classList.remove('show'); }
+function setLoading(btn, loading) { btn.classList.toggle('loading', loading); btn.disabled = loading; }
 
-function setLoading(btn, loading) {
-    btn.classList.toggle('loading', loading);
-    btn.disabled = loading;
-}
-
-// Email Login
+// ======= Email Login =======
 document.getElementById('form-login').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('login-btn');
@@ -178,69 +231,137 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
         await Auth.loginEmail(email, password);
         showMessage('✅ Welcome back!', 'success');
     } catch (err) {
-        const msg = err.code === 'auth/user-not-found' ? 'No account found with this email'
+        const msg = err.code === 'auth/user-not-found' ? 'No account found'
             : err.code === 'auth/wrong-password' ? 'Incorrect password'
             : err.code === 'auth/invalid-credential' ? 'Invalid email or password'
-            : err.code === 'auth/too-many-requests' ? 'Too many attempts. Try again later.'
+            : err.code === 'auth/too-many-requests' ? 'Too many attempts. Try later.'
             : err.message;
         showMessage(msg);
     } finally { setLoading(btn, false); }
 });
 
-// Email Signup
+// ======= Email Signup (with phone) =======
 document.getElementById('form-signup').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('signup-btn');
     const name = document.getElementById('signup-name').value.trim();
     const email = document.getElementById('signup-email').value.trim();
+    const phone = document.getElementById('signup-phone').value.trim();
     const password = document.getElementById('signup-password').value;
     if (!name) { showMessage('Please enter your name'); return; }
     if (password.length < 6) { showMessage('Password must be at least 6 characters'); return; }
     setLoading(btn, true);
     try {
-        await Auth.signUpEmail(email, password, name);
+        const user = await Auth.signUpEmail(email, password, name);
+        // Save phone number to Firestore
+        if (phone) {
+            await db.collection('users').doc(user.uid).update({ phone });
+        }
         showMessage('🎉 Account created! Redirecting...', 'success');
     } catch (err) {
-        const msg = err.code === 'auth/email-already-in-use' ? 'This email is already registered. Try logging in!'
-            : err.code === 'auth/weak-password' ? 'Password is too weak. Use 6+ characters.'
+        const msg = err.code === 'auth/email-already-in-use' ? 'Email already registered. Try logging in!'
+            : err.code === 'auth/weak-password' ? 'Password too weak. Use 6+ characters.'
             : err.message;
         showMessage(msg);
     } finally { setLoading(btn, false); }
 });
 
-// Google Login
-document.getElementById('google-login').addEventListener('click', async () => {
+// ======= Phone OTP Login =======
+let confirmationResult = null;
+
+// Initialize reCAPTCHA
+window.setupRecaptcha = function() {
+    if (window.recaptchaVerifier) return;
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible',
+        callback: () => {}
+    });
+};
+
+document.getElementById('phone-send-otp').addEventListener('click', async () => {
+    const phone = document.getElementById('phone-number').value.trim();
+    if (!phone || phone.length < 10) { showMessage('Enter a valid phone number with country code (e.g. +91...)'); return; }
+    const btn = document.getElementById('phone-send-otp');
+    setLoading(btn, true);
     try {
-        await Auth.loginGoogle();
+        setupRecaptcha();
+        confirmationResult = await auth.signInWithPhoneNumber(phone, window.recaptchaVerifier);
+        document.getElementById('phone-display').textContent = phone;
+        document.getElementById('phone-step-1').classList.remove('active');
+        document.getElementById('phone-step-2').classList.add('active');
+        otpBoxes[0].focus();
+        showMessage('📱 OTP sent to ' + phone, 'success');
     } catch (err) {
+        showMessage(err.code === 'auth/invalid-phone-number' ? 'Invalid phone number. Use format: +91XXXXXXXXXX'
+            : err.code === 'auth/too-many-requests' ? 'Too many attempts. Try later.'
+            : 'Failed to send OTP: ' + err.message);
+        // Reset reCAPTCHA
+        if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
+    } finally { setLoading(btn, false); }
+});
+
+document.getElementById('phone-verify-otp').addEventListener('click', async () => {
+    const code = [...otpBoxes].map(b => b.value).join('');
+    if (code.length !== 6) { showMessage('Enter the complete 6-digit code'); return; }
+    if (!confirmationResult) { showMessage('Please request OTP first'); return; }
+    const btn = document.getElementById('phone-verify-otp');
+    setLoading(btn, true);
+    try {
+        const result = await confirmationResult.confirm(code);
+        // Create user doc if new
+        const doc = await db.collection('users').doc(result.user.uid).get();
+        if (!doc.exists) {
+            await db.collection('users').doc(result.user.uid).set({
+                displayName: result.user.displayName || 'User',
+                email: result.user.email || '',
+                phone: result.user.phoneNumber || '',
+                photoURL: result.user.photoURL,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                xp: 0, streak: 0, lastVisit: null,
+                level: 'College Student', interests: [],
+                settings: { theme: 'dark', accent: '#4a6cf7', lang: 'en', fontSize: 'medium' }
+            });
+        }
+        showMessage('✅ Verified! Redirecting...', 'success');
+    } catch (err) {
+        showMessage(err.code === 'auth/invalid-verification-code' ? 'Wrong OTP. Please try again.'
+            : err.code === 'auth/code-expired' ? 'OTP expired. Please resend.'
+            : 'Verification failed: ' + err.message);
+    } finally { setLoading(btn, false); }
+});
+
+document.getElementById('phone-resend').addEventListener('click', () => {
+    document.getElementById('phone-step-2').classList.remove('active');
+    document.getElementById('phone-step-1').classList.add('active');
+    otpBoxes.forEach(b => b.value = '');
+    if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
+    clearMessage();
+});
+
+// ======= Social Logins =======
+document.getElementById('google-login').addEventListener('click', async () => {
+    try { await Auth.loginGoogle(); } catch (err) {
         if (err.code !== 'auth/popup-closed-by-user') showMessage(err.message);
     }
 });
 
-// GitHub Login
 document.getElementById('github-login').addEventListener('click', async () => {
-    try {
-        await Auth.loginGithub();
-    } catch (err) {
-        if (err.code === 'auth/account-exists-with-different-credential') {
-            showMessage('An account with this email already exists. Try Google login.');
-        } else if (err.code !== 'auth/popup-closed-by-user') {
-            showMessage(err.message);
-        }
+    try { await Auth.loginGithub(); } catch (err) {
+        if (err.code === 'auth/account-exists-with-different-credential')
+            showMessage('Account exists with different provider. Try Google.');
+        else if (err.code !== 'auth/popup-closed-by-user') showMessage(err.message);
     }
 });
 
-// Forgot Password
+// ======= Forgot Password =======
 document.getElementById('forgot-password').addEventListener('click', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value.trim();
     if (!email) { showMessage('Enter your email first, then click Forgot password'); return; }
     try {
         await Auth.resetPassword(email);
-        showMessage('📧 Password reset email sent! Check your inbox.', 'success');
-    } catch (err) {
-        showMessage('Could not send reset email. Check the email address.');
-    }
+        showMessage('📧 Password reset email sent!', 'success');
+    } catch { showMessage('Could not send reset email.'); }
 });
 </script>
 </body>

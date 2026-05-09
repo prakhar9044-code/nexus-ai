@@ -1,4 +1,4 @@
-/* NEXUS v3.0 — App Controller + Router + Toast + Attachment + Auth */
+/* NEXUS v3.0 — App Controller + Router + Toast + Notification + Attachment + Auth */
 const Toast = (() => {
     function show(msg, type = 'info', dur = 3500) {
         const c = document.querySelector('.toast-container');
@@ -10,6 +10,136 @@ const Toast = (() => {
         setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 250); }, dur);
     }
     return { show };
+})();
+
+// Premium Notification System
+const Notify = (() => {
+    let notifications = JSON.parse(localStorage.getItem('nexus_notifs') || '[]');
+    let badge = null;
+
+    function init() {
+        badge = document.getElementById('notif-badge');
+        updateBadge();
+
+        // Notification bell toggle
+        document.getElementById('notif-bell')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const panel = document.getElementById('notif-panel');
+            panel?.classList.toggle('active');
+            document.getElementById('user-dropdown')?.classList.remove('active');
+            if (panel?.classList.contains('active')) {
+                renderList();
+                markAllRead();
+            }
+        });
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#notif-panel') && !e.target.closest('#notif-bell')) {
+                document.getElementById('notif-panel')?.classList.remove('active');
+            }
+        });
+
+        // Clear button
+        document.getElementById('notif-clear')?.addEventListener('click', () => {
+            notifications = [];
+            save();
+            renderList();
+            updateBadge();
+        });
+
+        // Achievement close
+        document.getElementById('achievement-close')?.addEventListener('click', () => {
+            document.getElementById('achievement-overlay')?.classList.remove('active');
+        });
+    }
+
+    function add(type, title, desc, icon) {
+        const notif = {
+            id: Date.now(),
+            type, // 'xp', 'milestone', 'streak', 'info'
+            icon: icon || getDefaultIcon(type),
+            title, desc,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            read: false
+        };
+        notifications.unshift(notif);
+        if (notifications.length > 50) notifications = notifications.slice(0, 50);
+        save();
+        updateBadge();
+
+        // Ring the bell
+        const bell = document.getElementById('notif-bell');
+        bell?.classList.remove('has-notifs');
+        void bell?.offsetWidth;
+        bell?.classList.add('has-notifs');
+
+        // Also show toast
+        const toastType = type === 'xp' ? 'xp' : type === 'milestone' ? 'warning' : type === 'streak' ? 'error' : 'info';
+        Toast.show(`${icon || notif.icon} ${title}`, toastType);
+
+        // Log to Firestore activity
+        if (typeof DB !== 'undefined' && DB.saveUserProfile) {
+            db.collection('users').doc(auth.currentUser?.uid).collection('activity').add({
+                type, title, desc,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(() => {});
+        }
+
+        return notif;
+    }
+
+    function getDefaultIcon(type) {
+        return type === 'xp' ? '✨' : type === 'milestone' ? '🏆' : type === 'streak' ? '🔥' : 'ℹ️';
+    }
+
+    function showAchievement(icon, title, desc, xp) {
+        document.getElementById('achievement-icon').textContent = icon;
+        document.getElementById('achievement-title').textContent = title;
+        document.getElementById('achievement-desc').textContent = desc;
+        document.getElementById('achievement-xp').textContent = `+${xp} XP`;
+        document.getElementById('achievement-overlay')?.classList.add('active');
+        add('milestone', title, desc, icon);
+    }
+
+    function renderList() {
+        const list = document.getElementById('notif-list');
+        if (!list) return;
+        if (!notifications.length) {
+            list.innerHTML = '<div class="notif-empty">✨ All caught up! No notifications.</div>';
+            return;
+        }
+        list.innerHTML = notifications.slice(0, 30).map(n => `
+            <div class="notif-item">
+                <div class="notif-item-icon ${n.type}">${n.icon}</div>
+                <div class="notif-item-content">
+                    <div class="notif-item-title">${n.title}</div>
+                    <div class="notif-item-desc">${n.desc}</div>
+                    <div class="notif-item-time">${n.time}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function markAllRead() {
+        notifications.forEach(n => n.read = true);
+        save();
+        updateBadge();
+    }
+
+    function updateBadge() {
+        const unread = notifications.filter(n => !n.read).length;
+        if (badge) {
+            badge.textContent = unread > 99 ? '99+' : unread;
+            badge.style.display = unread > 0 ? 'flex' : 'none';
+        }
+    }
+
+    function save() {
+        localStorage.setItem('nexus_notifs', JSON.stringify(notifications));
+    }
+
+    return { init, add, showAchievement };
 })();
 
 // Document generation helper
@@ -134,11 +264,12 @@ const App = (() => {
             // User is logged in — set up the app
             setupUserUI(user);
             await DB.migrateFromLocalStorage();
-            await DB.updateStreak();
+            const streak = await DB.updateStreak();
 
             Preloader.init();
             setTimeout(() => {
                 Settings.init();
+                Notify.init();
                 setupNav();
                 setupVoice();
                 setupKeyboard();
@@ -148,6 +279,18 @@ const App = (() => {
                 Chat.init();
                 Router.go('chat');
                 Settings.applyTheme();
+
+                // Welcome notification
+                const name = user.displayName || 'there';
+                Notify.add('info', `Welcome back, ${name}!`, 'Ready to learn and grow today? 🚀', '👋');
+                if (streak > 1) {
+                    Notify.add('streak', `🔥 ${streak}-day streak!`, `You've been consistent for ${streak} days. Keep it up!`, '🔥');
+                }
+                if (streak === 7) {
+                    Notify.showAchievement('🔥', 'Week Warrior!', 'You maintained a 7-day learning streak!', 100);
+                } else if (streak === 30) {
+                    Notify.showAchievement('💎', 'Monthly Master!', 'Incredible! 30 days of consistent learning!', 500);
+                }
             }, 100);
         });
     }

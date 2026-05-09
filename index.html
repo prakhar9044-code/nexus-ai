@@ -65,6 +65,7 @@
 <div class="header-right">
 <div class="speaking-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>Speaking...</div>
 <div class="voice-waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+<button class="header-btn notif-bell" id="notif-bell" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge" id="notif-badge">0</span></button>
 <button class="header-btn" id="bug-report-btn" title="Report Bug"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M8 2l1.88 1.88M14.12 3.88L16 2M9 7.13v-1a3 3 0 0 1 6 0v1M12 20c-3.3 0-6-2.7-6-6v-3a6 6 0 0 1 12 0v3c0 3.3-2.7 6-6 6zM12 20v2M8.5 13h7M8.5 17h7M2 10h2M20 10h2M2 14h2M20 14h2"/></svg></button>
 <button class="header-btn" id="header-settings-btn" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg></button>
 <div class="header-user" id="header-user" title="Account">
@@ -72,6 +73,31 @@
 </div>
 </div>
 </header>
+
+<!-- Notification Center -->
+<div class="notif-panel" id="notif-panel">
+<div class="notif-panel-header">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-clear" id="notif-clear">Clear all</button>
+</div>
+<div class="notif-list" id="notif-list">
+    <div class="notif-empty">No notifications yet</div>
+</div>
+</div>
+
+<!-- Achievement Popup -->
+<div class="achievement-overlay" id="achievement-overlay">
+<div class="achievement-popup">
+    <div class="achievement-confetti"></div>
+    <div class="achievement-icon" id="achievement-icon">🏆</div>
+    <h2 class="achievement-title" id="achievement-title">Achievement Unlocked!</h2>
+    <p class="achievement-desc" id="achievement-desc">You've reached a new milestone</p>
+    <div class="achievement-xp" id="achievement-xp">+50 XP</div>
+    <button class="auth-btn primary-btn achievement-close" id="achievement-close" style="max-width:200px;margin:0 auto;">
+        <span class="btn-text">Awesome! 🎉</span>
+    </button>
+</div>
+</div>
 
 <!-- CHAT PANEL -->
 <div class="feature-panel active" id="panel-chat">
