@@ -269,9 +269,20 @@ document.getElementById('form-signup').addEventListener('submit', async (e) => {
 // ======= Phone OTP Login =======
 let confirmationResult = null;
 
-// Initialize reCAPTCHA
+// Initialize reCAPTCHA — always fresh
 window.setupRecaptcha = function() {
-    if (window.recaptchaVerifier) return;
+    // Destroy old verifier completely
+    if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch(e) {}
+        window.recaptchaVerifier = null;
+    }
+    // Recreate the container element to avoid "already rendered" error
+    const old = document.getElementById('recaptcha-container');
+    if (old) {
+        const fresh = document.createElement('div');
+        fresh.id = 'recaptcha-container';
+        old.replaceWith(fresh);
+    }
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
         size: 'invisible',
         callback: () => {}
@@ -295,8 +306,8 @@ document.getElementById('phone-send-otp').addEventListener('click', async () => 
         showMessage(err.code === 'auth/invalid-phone-number' ? 'Invalid phone number. Use format: +91XXXXXXXXXX'
             : err.code === 'auth/too-many-requests' ? 'Too many attempts. Try later.'
             : 'Failed to send OTP: ' + err.message);
-        // Reset reCAPTCHA
-        if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
+        // Reset reCAPTCHA for next attempt
+        if (window.recaptchaVerifier) { try { window.recaptchaVerifier.clear(); } catch(e) {} window.recaptchaVerifier = null; }
     } finally { setLoading(btn, false); }
 });
 
