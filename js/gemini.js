@@ -292,5 +292,30 @@ When the user tells you what they did, award XP appropriately and show their upd
         return full;
     }
 
-    return { stream, ask, getConversation, resetConversation, resetAll, PROMPTS };
+    // Image generation via Gemini
+    async function generateImage(prompt) {
+        const resp = await fetch('/api/image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.error || 'Image generation failed');
+        }
+        return await resp.json(); // { image: { mimeType, data }, text }
+    }
+
+    // Detect if user wants an image
+    function isImageRequest(text) {
+        const t = text.toLowerCase();
+        const patterns = [
+            /^(generate|create|make|draw|design|paint|sketch)\s+(an?\s+)?(image|picture|photo|illustration|art|diagram|logo|icon|poster|banner)/i,
+            /^(show me|give me|i want)\s+(an?\s+)?(image|picture|photo|illustration)/i,
+            /\b(generate|create|draw)\s+(image|picture|art)\s+(of|for|about)\b/i,
+        ];
+        return patterns.some(p => p.test(t));
+    }
+
+    return { stream, ask, generateImage, isImageRequest, getConversation, resetConversation, resetAll, PROMPTS };
 })();

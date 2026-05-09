@@ -75,6 +75,13 @@ const FeatureChat = (() => {
             msgContainer.scrollTop = msgContainer.scrollHeight;
             // Speak if enabled
             if (typeof Voice !== 'undefined') Voice.speak(fullText);
+            // Auto XP based on feature type
+            try {
+                const xpMap = { mockInterview: 20, codingArena: 20, resumeBuilder: 25, careerPath: 15, skillAnalyzer: 15, aiTeacher: 10 };
+                const xpAmount = xpMap[featureId] || 10;
+                const reasonMap = { mockInterview: 'Mock interview practice', codingArena: 'Coding practice', resumeBuilder: 'Resume building', careerPath: 'Career planning', skillAnalyzer: 'Skill analysis', aiTeacher: 'AI Teacher lesson', mentor: 'Mentor session', roadmap: 'Roadmap planning', projectIdeas: 'Project brainstorm', learningPath: 'Learning path', recruiterSim: 'Recruiter simulation', personality: 'Personality analysis', realityCheck: 'Reality check', accountability: 'Accountability check', networking: 'Networking practice', jobMarket: 'Job market research' };
+                Features.addXP(xpAmount, reasonMap[featureId] || 'Feature interaction');
+            } catch(e) {}
             return fullText;
         } catch (err) {
             typingEl.querySelector('.message-bubble').innerHTML = `<p style="color:var(--red)">⚠️ ${err.message}</p>`;

@@ -1,4 +1,4 @@
-/* NEXUS v2.0 — App Controller + Router + Toast + Attachment + Doc Gen */
+/* NEXUS v3.0 — App Controller + Router + Toast + Attachment + Auth */
 const Toast = (() => {
     function show(msg, type = 'info', dur = 3500) {
         const c = document.querySelector('.toast-container');
@@ -125,17 +125,91 @@ const Router = (() => {
 
 const App = (() => {
     function init() {
-        Preloader.init();
-        setTimeout(() => {
-            Settings.init();
-            setupNav();
-            setupVoice();
-            setupKeyboard();
-            Attachment.init();
-            Chat.init();
-            Router.go('chat');
-            Settings.applyTheme();
-        }, 100);
+        // Auth gate — redirect if not logged in
+        Auth.onAuthChange(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            // User is logged in — set up the app
+            setupUserUI(user);
+            await DB.migrateFromLocalStorage();
+            await DB.updateStreak();
+
+            Preloader.init();
+            setTimeout(() => {
+                Settings.init();
+                setupNav();
+                setupVoice();
+                setupKeyboard();
+                setupBugReport();
+                setupUserDropdown();
+                Attachment.init();
+                Chat.init();
+                Router.go('chat');
+                Settings.applyTheme();
+            }, 100);
+        });
+    }
+
+    function setupUserUI(user) {
+        // Header avatar
+        const avatar = document.getElementById('header-avatar');
+        if (avatar && user.photoURL) {
+            avatar.src = user.photoURL;
+        } else if (avatar) {
+            // Show initial
+            const name = user.displayName || user.email || 'U';
+            avatar.style.display = 'none';
+            const parent = avatar.parentElement;
+            if (parent && !parent.querySelector('.avatar-initial')) {
+                const initial = document.createElement('span');
+                initial.className = 'avatar-initial';
+                initial.textContent = name.charAt(0).toUpperCase();
+                parent.appendChild(initial);
+            }
+        }
+        // Welcome screen name
+        const h2 = document.querySelector('.welcome-screen h2');
+        const uname = user.displayName || '';
+        if (h2 && uname) h2.textContent = `Hey ${uname}! 👋`;
+        // Set name in localStorage for backward compat
+        if (uname) localStorage.setItem('nexus_student_name', uname);
+    }
+
+    function setupUserDropdown() {
+        const avatar = document.getElementById('header-user');
+        const dropdown = document.getElementById('user-dropdown');
+        const info = document.getElementById('user-dropdown-info');
+
+        if (!avatar || !dropdown) return;
+
+        // Populate info
+        const user = auth.currentUser;
+        if (user && info) {
+            info.innerHTML = `<strong>${user.displayName || 'User'}</strong><br><span style="font-size:0.72rem;color:var(--text-tertiary);">${user.email}</span>`;
+        }
+
+        avatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', () => dropdown.classList.remove('active'));
+        dropdown.addEventListener('click', e => e.stopPropagation());
+
+        document.getElementById('dropdown-settings-btn')?.addEventListener('click', () => {
+            dropdown.classList.remove('active');
+            Settings.open();
+        });
+        document.getElementById('dropdown-bug-btn')?.addEventListener('click', () => {
+            dropdown.classList.remove('active');
+            openBugReport();
+        });
+        document.getElementById('dropdown-logout-btn')?.addEventListener('click', () => {
+            dropdown.classList.remove('active');
+            Auth.logout();
+        });
     }
 
     function setupNav() {
@@ -159,20 +233,19 @@ const App = (() => {
             item.addEventListener('click', () => {
                 const feature = item.dataset.feature;
                 if (feature) Router.go(feature);
-                closeMobileNav(); // Auto-close on mobile
+                closeMobileNav();
             });
         });
 
-        // Mobile nav toggle — open/close with icon swap
+        // Mobile nav toggle
         mobileBtn?.addEventListener('click', () => {
             if (featureNav?.classList.contains('mobile-open')) {
                 closeMobileNav();
             } else {
-                closeSidebar(); // Close sidebar if open
+                closeSidebar();
                 openMobileNav();
             }
         });
-        // Close when tapping dark overlay
         mobileOverlay?.addEventListener('click', closeMobileNav);
 
         // Sidebar toggle with overlay
@@ -183,7 +256,7 @@ const App = (() => {
         function openSidebar() {
             sidebar?.classList.add('open');
             sidebarOverlay?.classList.add('active');
-            closeMobileNav(); // Close feature nav if open
+            closeMobileNav();
         }
         function closeSidebar() {
             sidebar?.classList.remove('open');
@@ -191,29 +264,78 @@ const App = (() => {
         }
 
         if (toggle) toggle.addEventListener('click', () => {
-            if (sidebar?.classList.contains('open')) {
-                closeSidebar();
-            } else {
-                openSidebar();
-            }
+            if (sidebar?.classList.contains('open')) closeSidebar();
+            else openSidebar();
         });
 
-        // Close sidebar when tapping overlay
         sidebarOverlay?.addEventListener('click', closeSidebar);
 
-        // Close sidebar when selecting a chat from history
         document.querySelector('.chat-history')?.addEventListener('click', e => {
             if (e.target.closest('.history-item')) closeSidebar();
         });
 
-        // Close sidebar when "New Chat" is clicked
         document.getElementById('new-chat-btn')?.addEventListener('click', () => {
             setTimeout(closeSidebar, 100);
         });
 
-        // Settings button closes sidebar first
         document.getElementById('settings-btn')?.addEventListener('click', () => { closeSidebar(); Settings.open(); });
         document.getElementById('header-settings-btn')?.addEventListener('click', () => { closeSidebar(); Settings.open(); });
+
+        // Feature nav collapse (desktop)
+        const collapseBtn = document.querySelector('.fnav-collapse-btn');
+        if (collapseBtn) {
+            const isCollapsed = localStorage.getItem('nexus_nav_collapsed') === '1';
+            if (isCollapsed) featureNav?.classList.add('collapsed');
+            collapseBtn.addEventListener('click', () => {
+                featureNav?.classList.toggle('collapsed');
+                const collapsed = featureNav?.classList.contains('collapsed');
+                localStorage.setItem('nexus_nav_collapsed', collapsed ? '1' : '0');
+                collapseBtn.textContent = collapsed ? '»' : '«';
+            });
+        }
+    }
+
+    function setupBugReport() {
+        const bugBtn = document.getElementById('bug-report-btn');
+        bugBtn?.addEventListener('click', openBugReport);
+        document.getElementById('bug-modal-close')?.addEventListener('click', closeBugReport);
+        document.getElementById('bug-modal')?.addEventListener('click', e => {
+            if (e.target.id === 'bug-modal') closeBugReport();
+        });
+
+        document.getElementById('bug-submit-btn')?.addEventListener('click', async () => {
+            const desc = document.getElementById('bug-description')?.value?.trim();
+            const steps = document.getElementById('bug-steps')?.value?.trim();
+            if (!desc) { Toast.show('Please describe the bug', 'error'); return; }
+            try {
+                await DB.submitBugReport({
+                    description: desc,
+                    steps: steps || 'Not provided',
+                    device: navigator.userAgent,
+                    screen: `${screen.width}x${screen.height}`,
+                    url: window.location.href
+                });
+                Toast.show('🐛 Bug report submitted! Thank you!', 'success');
+                closeBugReport();
+                document.getElementById('bug-description').value = '';
+                document.getElementById('bug-steps').value = '';
+            } catch (err) {
+                Toast.show('Failed to submit. Try again.', 'error');
+            }
+        });
+    }
+
+    function openBugReport() {
+        const modal = document.getElementById('bug-modal');
+        if (modal) modal.classList.add('active');
+        const deviceInfo = document.getElementById('bug-device-info');
+        if (deviceInfo) {
+            deviceInfo.textContent = `📱 Device: ${navigator.userAgent.slice(0, 80)}... | Screen: ${screen.width}x${screen.height}`;
+        }
+    }
+
+    function closeBugReport() {
+        document.getElementById('bug-modal')?.classList.remove('active');
     }
 
     function setupVoice() {
@@ -246,7 +368,7 @@ const App = (() => {
 
     function setupKeyboard() {
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { Settings.close(); Voice.stopSpeaking(); }
+            if (e.key === 'Escape') { Settings.close(); closeBugReport(); Voice.stopSpeaking(); }
             if (e.ctrlKey && e.key === 'm') { e.preventDefault(); Voice.toggleListening(); }
             if (e.ctrlKey && e.key === 'n') { e.preventDefault(); Chat.newChat(); Router.go('chat'); }
         });

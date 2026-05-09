@@ -191,10 +191,16 @@ const Features = (() => {
 
     // ---- XP & Gamification System ----
     function getXP() { return parseInt(localStorage.getItem('nexus_xp') || '0'); }
-    function addXP(amount) {
+    function addXP(amount, reason = 'Activity') {
         const before = getXP();
         const after = before + amount;
         localStorage.setItem('nexus_xp', after.toString());
+        // Log to localStorage
+        const log = JSON.parse(localStorage.getItem('nexus_xp_log') || '[]');
+        log.push({ xp: amount, reason, time: new Date().toLocaleString() });
+        localStorage.setItem('nexus_xp_log', JSON.stringify(log));
+        // Save to Firestore (async, non-blocking)
+        DB.updateXP(amount, reason).catch(() => {});
         const lb = getLevel(before), la = getLevel(after);
         if (la.level > lb.level) {
             Toast.show(`🎉 LEVEL UP! You're now ${la.name}! ${la.icon}`, 'success');
@@ -245,22 +251,23 @@ const Features = (() => {
             </div>
 
             <div class="fcard" style="margin-top:16px;">
-                <div class="fcard-title">🎯 Earn XP</div>
-                <div class="fcard-subtitle">Complete activities to level up!</div>
-                <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
-                    <button class="fbtn fbtn-secondary xp-earn-btn" data-xp="20" data-reason="Coding practice">🧪 Solved a coding problem (+20 XP)</button>
-                    <button class="fbtn fbtn-secondary xp-earn-btn" data-xp="15" data-reason="Learning session">📚 Completed a learning session (+15 XP)</button>
-                    <button class="fbtn fbtn-secondary xp-earn-btn" data-xp="30" data-reason="Job application">📄 Submitted a job application (+30 XP)</button>
-                    <button class="fbtn fbtn-secondary xp-earn-btn" data-xp="25" data-reason="Mock interview">🎤 Completed a mock interview (+25 XP)</button>
-                    <button class="fbtn fbtn-secondary xp-earn-btn" data-xp="50" data-reason="Challenge completed">🏆 Completed a challenge (+50 XP)</button>
-                    <button class="fbtn fbtn-secondary xp-earn-btn" data-xp="10" data-reason="Daily streak bonus">🔥 Daily check-in (+10 XP)</button>
+                <div class="fcard-title">🎯 How to Earn XP</div>
+                <div class="fcard-subtitle">XP is automatically awarded for your activities!</div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;font-size:0.82rem;">
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>💬 Chat interaction</span><span style="color:var(--green);font-weight:600;">+5 XP</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>🧑‍🏫 AI Teacher lesson</span><span style="color:var(--green);font-weight:600;">+10 XP</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>🎯 Career / Skill features</span><span style="color:var(--green);font-weight:600;">+15 XP</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>🎤 Mock Interview / Coding</span><span style="color:var(--green);font-weight:600;">+20 XP</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>📄 Resume Builder</span><span style="color:var(--green);font-weight:600;">+25 XP</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span>🖼️ Image Generation</span><span style="color:var(--green);font-weight:600;">+15 XP</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;"><span>🌅 Daily first interaction</span><span style="color:var(--green);font-weight:600;">+10 XP</span></div>
                 </div>
             </div>
 
             <div class="fcard" style="margin-top:16px;">
-                <div class="fcard-title">📜 XP History</div>
+                <div class="fcard-title">📜 Recent Activity</div>
                 <div id="xp-history" style="margin-top:8px;max-height:200px;overflow-y:auto;">
-                    ${log.length ? log.slice(-10).reverse().map(e => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8rem;"><span>${e.reason}</span><span style="color:var(--green);font-weight:600;">+${e.xp} XP</span></div>`).join('') : '<p style="color:var(--text-tertiary);font-size:0.82rem;">No XP earned yet — start learning!</p>'}
+                    ${log.length ? log.slice(-10).reverse().map(e => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.8rem;"><span>${e.reason}</span><span style="color:var(--green);font-weight:600;">+${e.xp} XP</span></div>`).join('') : '<p style="color:var(--text-tertiary);font-size:0.82rem;">Start using features to earn XP automatically!</p>'}
                 </div>
             </div>
 
@@ -272,20 +279,7 @@ const Features = (() => {
             </div>
         `;
 
-        // Wire up XP earn buttons
-        container.querySelectorAll('.xp-earn-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const amount = parseInt(btn.dataset.xp);
-                const reason = btn.dataset.reason;
-                addXP(amount);
-                // Log it
-                const log = JSON.parse(localStorage.getItem('nexus_xp_log') || '[]');
-                log.push({ xp: amount, reason, time: new Date().toLocaleString() });
-                localStorage.setItem('nexus_xp_log', JSON.stringify(log));
-                // Re-render
-                renderGamification(container);
-            });
-        });
+        // XP is now auto-awarded — no manual buttons needed
     }
 
     // ---- Dashboard Rendering ----

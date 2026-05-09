@@ -1,6 +1,7 @@
-/* NEXUS v2.0 — Chat UI (uses Nexus engine) */
+/* NEXUS v3.0 — Chat UI (with image gen, auto XP, animations, Firestore) */
 const Chat = (() => {
     let currentChatId = null, isProcessing = false;
+    let dailyXPGiven = localStorage.getItem('nexus_daily_xp_date') === new Date().toDateString();
 
     function init() {
         setupInput(); setupWelcomeChips(); loadCurrentChat(); Settings.updateWelcomeName();
@@ -31,22 +32,76 @@ const Chat = (() => {
         showTyping(true); isProcessing = true;
 
         try {
-            const msgEl = addMessage('nexus', '', true);
-            const bubble = msgEl.querySelector('.message-bubble');
-            let full = '';
-            for await (const chunk of Nexus.stream('chat', text)) {
-                full += chunk; bubble.innerHTML = renderMd(full); scrollBottom();
+            // Check if this is an image request
+            if (Nexus.isImageRequest(text)) {
+                await handleImageRequest(text);
+            } else {
+                await handleChatRequest(text);
             }
-            bubble.innerHTML = renderMd(full); addCopyBtns(bubble); addActions(msgEl, full);
-            scrollBottom(); Voice.speak(full); saveCurrent(); updateHistory();
+            // Auto XP: +5 for chat interaction
+            awardAutoXP(5, 'Chat interaction');
         } catch (err) {
             addMessage('nexus', '⚠️ ' + err.message); Toast.show(err.message, 'error');
         } finally { showTyping(false); isProcessing = false; }
     }
 
+    async function handleChatRequest(text) {
+        const msgEl = addMessage('nexus', '', true);
+        const bubble = msgEl.querySelector('.message-bubble');
+        let full = '';
+        for await (const chunk of Nexus.stream('chat', text)) {
+            full += chunk; bubble.innerHTML = renderMd(full); scrollBottom();
+        }
+        bubble.innerHTML = renderMd(full); addCopyBtns(bubble); addActions(msgEl, full);
+        scrollBottom(); Voice.speak(full); saveCurrent(); updateHistory();
+    }
+
+    async function handleImageRequest(text) {
+        const msgEl = addMessage('nexus', '', true);
+        const bubble = msgEl.querySelector('.message-bubble');
+        bubble.innerHTML = '<div class="img-generating"><div class="img-gen-spinner"></div><span>🎨 Generating image...</span></div>';
+        scrollBottom();
+
+        try {
+            const result = await Nexus.generateImage(text);
+            let html = '';
+            if (result.image) {
+                html += `<div class="generated-image-container">
+                    <img src="data:${result.image.mimeType};base64,${result.image.data}" class="generated-image" alt="Generated image">
+                    <button class="img-download-btn" onclick="(function(){const a=document.createElement('a');a.href='data:${result.image.mimeType};base64,${result.image.data}';a.download='nexus-image-${Date.now()}.png';a.click();})()">📥 Download Image</button>
+                </div>`;
+            }
+            if (result.text) {
+                html += renderMd(result.text);
+            }
+            if (!result.image && !result.text) {
+                html = renderMd('⚠️ Could not generate the image. Try rephrasing your request.');
+            }
+            bubble.innerHTML = html;
+            addActions(msgEl, result.text || 'Image generated');
+            // Auto XP for image generation
+            awardAutoXP(15, 'Image generation');
+        } catch (err) {
+            bubble.innerHTML = renderMd('⚠️ ' + err.message);
+        }
+        scrollBottom(); saveCurrent(); updateHistory();
+    }
+
+    function awardAutoXP(amount, reason) {
+        try {
+            // Daily first interaction bonus
+            if (!dailyXPGiven) {
+                dailyXPGiven = true;
+                localStorage.setItem('nexus_daily_xp_date', new Date().toDateString());
+                Features.addXP(10, 'Daily first interaction');
+            }
+            Features.addXP(amount, reason);
+        } catch (e) { /* XP system might not be loaded */ }
+    }
+
     function addMessage(role, text, streaming = false) {
         const ma = document.querySelector('.messages-area'), msg = document.createElement('div');
-        msg.className = `message ${role}-message`;
+        msg.className = `message ${role}-message msg-animate`;
         const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
         const name = localStorage.getItem('nexus_student_name') || 'You';
         if (role === 'nexus') {
@@ -61,10 +116,16 @@ const Chat = (() => {
 
     function addActions(el, text) {
         const a = el.querySelector('.message-actions'); if (!a) return;
-        a.innerHTML = `<button class="msg-action-btn" data-a="copy">📋 Copy</button><button class="msg-action-btn" data-a="speak">🔊 Read</button>`;
+        a.innerHTML = `<button class="msg-action-btn" data-a="copy">📋 Copy</button><button class="msg-action-btn" data-a="speak">🔊 Read</button><button class="msg-action-btn" data-a="download">📥 Save</button><button class="msg-action-btn reaction" data-a="like">👍</button><button class="msg-action-btn reaction" data-a="dislike">👎</button>`;
         a.querySelectorAll('.msg-action-btn').forEach(b => b.addEventListener('click', () => {
             if (b.dataset.a==='copy') { navigator.clipboard.writeText(text); b.textContent='✓ Copied'; setTimeout(()=>b.textContent='📋 Copy',2000); }
-            else { Voice.stopSpeaking(); const o=localStorage.getItem('nexus_auto_speak'); localStorage.setItem('nexus_auto_speak','true'); Voice.speak(text); if(o!==null)localStorage.setItem('nexus_auto_speak',o);else localStorage.removeItem('nexus_auto_speak'); }
+            else if (b.dataset.a==='speak') { Voice.stopSpeaking(); const o=localStorage.getItem('nexus_auto_speak'); localStorage.setItem('nexus_auto_speak','true'); Voice.speak(text); if(o!==null)localStorage.setItem('nexus_auto_speak',o);else localStorage.removeItem('nexus_auto_speak'); }
+            else if (b.dataset.a==='download') {
+                const title = text.slice(0, 50).replace(/[^a-zA-Z0-9 ]/g, '');
+                DocHelper.downloadHTML(`nexus-${Date.now()}.html`, title || 'Nexus Response', el.querySelector('.message-bubble').innerHTML);
+            }
+            else if (b.dataset.a==='like') { b.textContent = '👍✅'; b.disabled = true; }
+            else if (b.dataset.a==='dislike') { b.textContent = '👎'; b.disabled = true; }
         }));
     }
 
@@ -98,11 +159,29 @@ const Chat = (() => {
 
     function generateId(){return 'c_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);}
     function newChat(){currentChatId=generateId();Nexus.resetConversation('chat');const ma=document.querySelector('.messages-area');if(ma){ma.innerHTML='';ma.style.display='none';}document.querySelector('.welcome-screen').style.display='flex';document.getElementById('chat-input').value='';updateHistory();Voice.stopSpeaking();Settings.updateWelcomeName();}
-    function saveCurrent(){if(!currentChatId)currentChatId=generateId();const ma=document.querySelector('.messages-area');const msgs=[];ma.querySelectorAll('.message').forEach(m=>{const r=m.classList.contains('user-message')?'user':'nexus';msgs.push({role:r,text:m.querySelector('.message-bubble').textContent,html:m.querySelector('.message-bubble').innerHTML,time:m.querySelector('.message-time')?.textContent||''});});if(!msgs.length)return;const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');c[currentChatId]={id:currentChatId,title:msgs[0]?.text?.slice(0,50)||'Chat',messages:msgs,conversation:Nexus.getConversation('chat'),updatedAt:Date.now()};localStorage.setItem('nexus_chats',JSON.stringify(c));}
+
+    function saveCurrent(){
+        if(!currentChatId)currentChatId=generateId();
+        const ma=document.querySelector('.messages-area');
+        const msgs=[];
+        ma.querySelectorAll('.message').forEach(m=>{
+            const r=m.classList.contains('user-message')?'user':'nexus';
+            msgs.push({role:r,text:m.querySelector('.message-bubble').textContent,html:m.querySelector('.message-bubble').innerHTML,time:m.querySelector('.message-time')?.textContent||''});
+        });
+        if(!msgs.length)return;
+        const chatData = {id:currentChatId,title:msgs[0]?.text?.slice(0,50)||'Chat',messages:msgs,updatedAt:Date.now()};
+        // Save to localStorage for instant access
+        const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');
+        c[currentChatId]=chatData;
+        localStorage.setItem('nexus_chats',JSON.stringify(c));
+        // Also save to Firestore (async, non-blocking)
+        DB.saveChat(currentChatId, chatData).catch(()=>{});
+    }
+
     function loadChat(id){const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}')[id];if(!c)return;currentChatId=id;Nexus.resetConversation('chat');if(c.conversation)c.conversation.forEach(m=>Nexus.getConversation('chat').push(m));document.querySelector('.welcome-screen').style.display='none';const ma=document.querySelector('.messages-area');ma.style.display='flex';ma.innerHTML='';const n=localStorage.getItem('nexus_student_name')||'You';c.messages.forEach(m=>{const el=document.createElement('div');el.className=`message ${m.role}-message`;if(m.role==='nexus'){el.innerHTML=`<div class="message-avatar"><img src="assets/logo.png" alt="N"></div><div class="message-content"><span class="message-sender">Nexus</span><div class="message-bubble">${m.html}</div><span class="message-time">${m.time}</span><div class="message-actions"></div></div>`;ma.appendChild(el);addCopyBtns(el.querySelector('.message-bubble'));addActions(el,m.text);}else{el.innerHTML=`<div class="message-avatar">${n.charAt(0).toUpperCase()}</div><div class="message-content"><span class="message-sender">${esc(n)}</span><div class="message-bubble">${m.html}</div><span class="message-time">${m.time}</span></div>`;ma.appendChild(el);}});scrollBottom();updateHistory();}
     function loadCurrentChat(){currentChatId=generateId();updateHistory();}
-    function deleteChat(id){const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');delete c[id];localStorage.setItem('nexus_chats',JSON.stringify(c));if(id===currentChatId)newChat();updateHistory();}
-    function clearAllChats(){localStorage.removeItem('nexus_chats');Nexus.resetConversation('chat');newChat();}
+    function deleteChat(id){const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');delete c[id];localStorage.setItem('nexus_chats',JSON.stringify(c));DB.deleteChat(id).catch(()=>{});if(id===currentChatId)newChat();updateHistory();}
+    function clearAllChats(){localStorage.removeItem('nexus_chats');DB.clearAllChats().catch(()=>{});Nexus.resetConversation('chat');newChat();}
     function updateHistory(){const ct=document.querySelector('.chat-history');if(!ct)return;const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');const s=Object.values(c).sort((a,b)=>b.updatedAt-a.updatedAt);ct.innerHTML='<div class="chat-history-title">Recent</div>';if(!s.length){ct.innerHTML+='<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:.78rem">No chats yet</div>';return;}s.forEach(ch=>{const it=document.createElement('div');it.className=`history-item ${ch.id===currentChatId?'active':''}`;it.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${esc(ch.title)}</span><button class="delete-chat" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`;it.addEventListener('click',e=>{if(!e.target.closest('.delete-chat')){Router.go('chat');loadChat(ch.id);}});it.querySelector('.delete-chat').addEventListener('click',e=>{e.stopPropagation();deleteChat(ch.id);});ct.appendChild(it);});}
     function exportChat(){const ma=document.querySelector('.messages-area');if(!ma)return;let t='=== NEXUS Chat Export ===\nDate: '+new Date().toLocaleString()+'\n\n';ma.querySelectorAll('.message').forEach(m=>{const r=m.classList.contains('user-message')?'You':'Nexus';t+=`[${m.querySelector('.message-time')?.textContent||''}] ${r}:\n${m.querySelector('.message-bubble').textContent}\n\n`;});const b=new Blob([t],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`nexus-${new Date().toISOString().slice(0,10)}.txt`;a.click();URL.revokeObjectURL(u);Toast.show('Chat exported!','success');}
 

@@ -12,10 +12,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Nexus">
-<link rel="stylesheet" href="css/main.css?v=6">
-<link rel="stylesheet" href="css/preloader.css?v=6">
-<link rel="stylesheet" href="css/chat.css?v=6">
-<link rel="stylesheet" href="css/features.css?v=6">
+<link rel="stylesheet" href="css/main.css?v=7">
+<link rel="stylesheet" href="css/preloader.css?v=7">
+<link rel="stylesheet" href="css/chat.css?v=7">
+<link rel="stylesheet" href="css/features.css?v=7">
 <style>
 .compact-mode .message-bubble{padding:10px 14px}.hide-timestamps .message-time{display:none}
 </style>
@@ -65,7 +65,11 @@
 <div class="header-right">
 <div class="speaking-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>Speaking...</div>
 <div class="voice-waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+<button class="header-btn" id="bug-report-btn" title="Report Bug"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M8 2l1.88 1.88M14.12 3.88L16 2M9 7.13v-1a3 3 0 0 1 6 0v1M12 20c-3.3 0-6-2.7-6-6v-3a6 6 0 0 1 12 0v3c0 3.3-2.7 6-6 6zM12 20v2M8.5 13h7M8.5 17h7M2 10h2M20 10h2M2 14h2M20 14h2"/></svg></button>
 <button class="header-btn" id="header-settings-btn" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 0 1 0 4h-.09c-.66 0-1.25.4-1.51 1z"/></svg></button>
+<div class="header-user" id="header-user" title="Account">
+  <img class="header-avatar" id="header-avatar" src="assets/logo.png" alt="">
+</div>
 </div>
 </header>
 
@@ -148,16 +152,50 @@
 
 <div class="toast-container"></div>
 
+<!-- Bug Report Modal -->
+<div class="modal-overlay" id="bug-modal">
+<div class="modal">
+<div class="modal-header"><h2>🐛 Report a Bug</h2><button class="modal-close" id="bug-modal-close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+<div class="modal-body">
+<div class="settings-section"><h3>What went wrong?</h3>
+<textarea class="setting-input" id="bug-description" rows="4" placeholder="Describe the bug..." style="font-family:var(--font-body);resize:vertical;min-height:80px;width:100%;"></textarea>
+</div>
+<div class="settings-section"><h3>Steps to reproduce</h3>
+<textarea class="setting-input" id="bug-steps" rows="3" placeholder="1. Go to...&#10;2. Click on...&#10;3. See error..." style="font-family:var(--font-body);resize:vertical;min-height:60px;width:100%;"></textarea>
+</div>
+<div class="settings-section">
+<div id="bug-device-info" style="font-size:0.72rem;color:var(--text-tertiary);padding:8px 12px;background:var(--bg-secondary);border-radius:8px;"></div>
+</div>
+<button class="btn-secondary" id="bug-submit-btn" style="width:100%;margin-top:8px;">🐛 Submit Bug Report</button>
+</div>
+</div>
+</div>
+
+<!-- User Menu Dropdown -->
+<div class="user-dropdown" id="user-dropdown">
+<div class="user-dropdown-header" id="user-dropdown-info"></div>
+<button class="user-dropdown-btn" id="dropdown-settings-btn">⚙️ Settings</button>
+<button class="user-dropdown-btn" id="dropdown-bug-btn">🐛 Report Bug</button>
+<button class="user-dropdown-btn danger" id="dropdown-logout-btn">🚪 Log Out</button>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js?v=7"></script>
+<script src="js/database.js?v=7"></script>
+
 <!-- SCRIPTS -->
-<script src="js/preloader.js?v=6"></script>
-<script src="js/knowledge.js?v=6"></script>
-<script src="js/gemini.js?v=6"></script>
-<script src="js/voice.js?v=6"></script>
-<script src="js/chat.js?v=6"></script>
-<script src="js/settings.js?v=6"></script>
-<script src="js/features/feature-chat.js?v=6"></script>
-<script src="js/features/all-features.js?v=6"></script>
-<script src="js/app.js?v=6"></script>
+<script src="js/preloader.js?v=7"></script>
+<script src="js/knowledge.js?v=7"></script>
+<script src="js/gemini.js?v=7"></script>
+<script src="js/voice.js?v=7"></script>
+<script src="js/chat.js?v=7"></script>
+<script src="js/settings.js?v=7"></script>
+<script src="js/features/feature-chat.js?v=7"></script>
+<script src="js/features/all-features.js?v=7"></script>
+<script src="js/app.js?v=7"></script>
 
 <script>
 // Build Feature Navigation + Panels dynamically
@@ -236,6 +274,14 @@ const footer = document.createElement('div');
 footer.className = 'fnav-footer';
 footer.innerHTML = 'Made with ❤️ by <a href="#">Prakhar</a>';
 nav.appendChild(footer);
+
+// Collapse button
+const collapseBtn = document.createElement('button');
+collapseBtn.className = 'fnav-collapse-btn';
+const isCollapsed = localStorage.getItem('nexus_nav_collapsed') === '1';
+collapseBtn.textContent = isCollapsed ? '»' : '«';
+if (isCollapsed) nav.classList.add('collapsed');
+nav.appendChild(collapseBtn);
 
 // Wire up feature inputs
 document.querySelectorAll('.feature-input').forEach(input => {
