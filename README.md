@@ -4,7 +4,7 @@
 <img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=0:0a0a0f,50:00f0ff,100:7b2fff&height=220&section=header&text=NEXUS%20AI&fontSize=80&fontColor=ffffff&fontAlignY=38&desc=Intelligent%20Career%20Strategist&descAlignY=58&descSize=22&animation=fadeIn&fontAlign=50" />
 
 <!-- Typing SVG -->
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=22&duration=3000&pause=800&color=00F0FF&center=true&vCenter=true&multiline=false&repeat=true&width=700&height=60&lines=🌌+RAG-Powered+Memory+%E2%80%94+Context+That+Lasts;⚡+Groq+Inference+%E2%80%94+Zero+Latency+Responses;🎙️+Voice+Interactive+%E2%80%94+Talk%2C+Don't+Type;🔒+Enterprise-Grade+Security+%E2%80%94+Always+Safe;🧠+Deep+Career+Intelligence+%E2%80%94+Built+For+You" alt="Typing SVG" />
+<img src="https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&weight=700&size=22&duration=3000&pause=800&color=00F0FF&center=true&vCenter=true&width=700&height=60&lines=RAG-Powered+Memory+-+Context+That+Lasts;Groq+Inference+-+Zero+Latency+Responses;Voice+Interactive+-+Talk%2C+Don%27t+Type;Enterprise-Grade+Security+-+Always+Safe;Deep+Career+Intelligence+-+Built+For+You" alt="Typing SVG" />
 
 <br/>
 
