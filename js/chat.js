@@ -54,6 +54,12 @@ const Chat = (() => {
         }
         bubble.innerHTML = renderMd(full); addCopyBtns(bubble); addActions(msgEl, full);
         scrollBottom(); Voice.speak(full); saveCurrent(); updateHistory();
+        // Memory: extract facts from this exchange
+        if (typeof Memory !== 'undefined') {
+            Memory.extractFromConversation(text, full).catch(() => {});
+            // Show quick action suggestions
+            showQuickActions(text, full, 'chat');
+        }
     }
 
     async function handleImageRequest(text) {
@@ -184,6 +190,30 @@ const Chat = (() => {
     function clearAllChats(){localStorage.removeItem('nexus_chats');DB.clearAllChats().catch(()=>{});Nexus.resetConversation('chat');newChat();}
     function updateHistory(){const ct=document.querySelector('.chat-history');if(!ct)return;const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');const s=Object.values(c).sort((a,b)=>b.updatedAt-a.updatedAt);ct.innerHTML='<div class="chat-history-title">Recent</div>';if(!s.length){ct.innerHTML+='<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:.78rem">No chats yet</div>';return;}s.forEach(ch=>{const it=document.createElement('div');it.className=`history-item ${ch.id===currentChatId?'active':''}`;it.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${esc(ch.title)}</span><button class="delete-chat" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`;it.addEventListener('click',e=>{if(!e.target.closest('.delete-chat')){Router.go('chat');loadChat(ch.id);}});it.querySelector('.delete-chat').addEventListener('click',e=>{e.stopPropagation();deleteChat(ch.id);});ct.appendChild(it);});}
     function exportChat(){const ma=document.querySelector('.messages-area');if(!ma)return;let t='=== NEXUS Chat Export ===\nDate: '+new Date().toLocaleString()+'\n\n';ma.querySelectorAll('.message').forEach(m=>{const r=m.classList.contains('user-message')?'You':'Nexus';t+=`[${m.querySelector('.message-time')?.textContent||''}] ${r}:\n${m.querySelector('.message-bubble').textContent}\n\n`;});const b=new Blob([t],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`nexus-${new Date().toISOString().slice(0,10)}.txt`;a.click();URL.revokeObjectURL(u);Toast.show('Chat exported!','success');}
+
+    function showQuickActions(userMsg, aiResp, featureId) {
+        if (typeof Memory === 'undefined') return;
+        const suggestions = Memory.getSuggestions(userMsg, aiResp, featureId);
+        if (!suggestions.length) return;
+        // Remove previous quick actions
+        document.querySelectorAll('.quick-actions').forEach(el => el.remove());
+        const container = document.createElement('div');
+        container.className = 'quick-actions';
+        suggestions.forEach((s, i) => {
+            const chip = document.createElement('button');
+            chip.className = 'quick-action-chip';
+            chip.textContent = s;
+            chip.style.animationDelay = `${i * 0.1}s`;
+            chip.addEventListener('click', () => {
+                document.getElementById('chat-input').value = s.replace(/^[^\s]+ /, ''); // Remove leading emoji
+                container.remove();
+                handleSend();
+            });
+            container.appendChild(chip);
+        });
+        document.querySelector('.messages-area')?.appendChild(container);
+        scrollBottom();
+    }
 
     return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom};
 })();

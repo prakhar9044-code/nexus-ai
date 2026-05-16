@@ -324,6 +324,8 @@ const App = (() => {
             // User is logged in — set up the app
             setupUserUI(user);
             await DB.migrateFromLocalStorage();
+            // Load AI Memory profile
+            if (typeof Memory !== 'undefined') Memory.load().catch(() => {});
             const streak = await DB.updateStreak();
 
             Preloader.init();

@@ -286,4 +286,50 @@
     .welcome-chip { padding: 8px 12px; font-size: 0.76rem; }
     .voice-preview { padding: 2px 14px; font-size: 0.72rem; }
     .attach-preview { padding: 4px 10px; }
+    .quick-action-chip { font-size: 0.72rem; padding: 7px 12px; }
+}
+
+/* ====== Quick Action Suggestion Chips ====== */
+.quick-actions {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    padding: 8px 48px 4px;
+    animation: fade-in 0.3s ease;
+}
+.quick-action-chip {
+    padding: 8px 16px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    opacity: 0;
+    animation: chip-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    position: relative;
+    overflow: hidden;
+}
+.quick-action-chip::before {
+    content: '';
+    position: absolute; inset: -1px;
+    background: linear-gradient(135deg, var(--accent), #a855f7);
+    border-radius: 21px;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: -1;
+}
+.quick-action-chip:hover {
+    color: var(--text-primary);
+    border-color: var(--accent);
+    background: rgba(74, 108, 247, 0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 108, 247, 0.15);
+}
+.quick-action-chip:hover::before { opacity: 0.12; }
+.quick-action-chip:active { transform: scale(0.96); }
+@keyframes chip-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }

@@ -211,6 +211,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="js/firebase-config.js?v=7"></script>
 <script src="js/database.js?v=7"></script>
+<script src="js/memory.js?v=1"></script>
 
 <!-- SCRIPTS -->
 <script src="js/preloader.js?v=7"></script>
@@ -406,6 +407,15 @@ document.querySelectorAll('.feature-input').forEach(input => {
       const h2 = document.querySelector('.welcome-screen h2');
       const uname = localStorage.getItem('nexus_student_name');
       if (h2 && uname) h2.textContent = `Hey ${uname}! 👋`;
+      // Sync to AI Memory Engine
+      if (typeof Memory !== 'undefined') {
+        const role = localStorage.getItem('nexus_level') || 'College Student';
+        Memory.update({
+          display_name: uname || '',
+          college_year: role,
+          interests: interests
+        }).catch(() => {});
+      }
       // Close
       overlay.classList.remove('active');
       overlay.classList.add('closing');

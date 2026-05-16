@@ -213,7 +213,9 @@ When the user tells you what they did, award XP appropriately and show their upd
         const lang = localStorage.getItem('nexus_lang') || 'en';
         const langInstr = lang === 'hi' ? '\nIMPORTANT: Respond in Hindi (Devanagari) mixed with English technical terms.' : '';
         const extra = extraContext ? '\nContext: ' + extraContext : '';
-        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra;
+        // Inject persistent memory context
+        const memoryCtx = (typeof Memory !== 'undefined') ? Memory.buildContext() : '';
+        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx;
 
         const requestBody = {
             model: MODEL,
