@@ -185,6 +185,8 @@ When the user tells you what they did, award XP appropriately and show their upd
 
     function resetConversation(featureId) {
         conversations[featureId] = [];
+        // Also reset agent state for this feature
+        if (typeof AgentState !== 'undefined') AgentState.reset(featureId);
     }
 
     function resetAll() {
@@ -206,6 +208,10 @@ When the user tells you what they did, award XP appropriately and show their upd
     async function* rawStream(featureId, userMessage, extraContext = '') {
         const userKey = getApiKey(); // Optional: user's own key from Settings
         const conv = getConversation(featureId);
+
+        // Context Window Manager: trim old messages before adding new one
+        if (typeof ContextManager !== 'undefined') ContextManager.preProcess(featureId);
+
         conv.push({ role: 'user', parts: [{ text: userMessage }] });
 
         const basePrompt = PROMPTS[featureId] || PROMPTS.chat;
@@ -217,7 +223,9 @@ When the user tells you what they did, award XP appropriately and show their upd
         const memoryCtx = (typeof Memory !== 'undefined') ? Memory.buildContext() : '';
         // Inject RAG knowledge retrieval
         const ragCtx = (typeof RAG !== 'undefined') ? RAG.buildContext(userMessage) : '';
-        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx;
+        // Inject agent state (interview progress, coding streak, etc.)
+        const agentCtx = (typeof AgentState !== 'undefined') ? AgentState.buildContext(featureId) : '';
+        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx;
 
         const requestBody = {
             model: MODEL,
@@ -266,7 +274,13 @@ When the user tells you what they did, award XP appropriately and show their upd
                     }
                 }
             }
-            if (fullText) conv.push({ role: 'model', parts: [{ text: fullText }] });
+            if (fullText) {
+                conv.push({ role: 'model', parts: [{ text: fullText }] });
+                // Update agent state from the response
+                if (typeof AgentState !== 'undefined') {
+                    AgentState.parseAndUpdate(featureId, userMessage, fullText);
+                }
+            }
         } catch (err) { conv.pop(); throw err; }
     }
 

@@ -96,6 +96,31 @@ const Chat = (() => {
                 Toast.show(`🎯 Mission complete: ${m.task} (+${m.xp} XP)`, 'xp');
             }
         }
+        // Show agent state progress (interview Q count, coding streak, etc.)
+        if (typeof AgentState !== 'undefined' && routedFeature !== 'chat') {
+            showAgentProgress(routedFeature, msgEl);
+        }
+    }
+
+    function showAgentProgress(featureId, msgEl) {
+        const state = AgentState.get(featureId);
+        let progressText = '';
+        if (featureId === 'mockInterview' && state.questionsAsked > 0) {
+            progressText = `📋 Q${state.questionsAsked}/${state.maxQuestions}`;
+            if (state.phase === 'done') progressText = `✅ Interview complete${state.overallScore ? ' — Score: ' + state.overallScore + '/10' : ''}`;
+        } else if (featureId === 'codingArena' && state.totalAttempts > 0) {
+            progressText = `💻 Solved: ${state.problemsSolved} | Streak: ${state.streak} | Difficulty: ${state.currentDifficulty.toUpperCase()}`;
+        } else if (featureId === 'aiTeacher' && state.quizResults.length > 0) {
+            const correct = state.quizResults.filter(r => r.correct).length;
+            progressText = `📊 Understanding: ${Math.round(state.understanding * 100)}% | Quiz: ${correct}/${state.quizResults.length}`;
+        } else if (featureId === 'personality' && state.questionsAsked > 0) {
+            progressText = `🧩 Assessment: ${state.questionsAsked}/${state.maxQuestions} questions`;
+        }
+        if (!progressText) return;
+        const bar = document.createElement('div');
+        bar.className = 'agent-progress-bar';
+        bar.textContent = progressText;
+        msgEl.querySelector('.message-content')?.appendChild(bar);
     }
 
     async function handleImageRequest(text) {
