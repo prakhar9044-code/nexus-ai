@@ -1,4 +1,4 @@
-/* NEXUS v3.0 — Chat UI (with image gen, auto XP, animations, Firestore) */
+/* NEXUS v4.0 — Chat UI (with image gen, auto XP, animations, Firestore, Smart Router, Missions) */
 const Chat = (() => {
     let currentChatId = null, isProcessing = false;
     let dailyXPGiven = localStorage.getItem('nexus_daily_xp_date') === new Date().toDateString();
@@ -7,6 +7,8 @@ const Chat = (() => {
         setupInput(); setupWelcomeChips(); loadCurrentChat(); Settings.updateWelcomeName();
         document.getElementById('new-chat-btn')?.addEventListener('click', () => { newChat(); Router.go('chat'); });
         document.getElementById('export-btn')?.addEventListener('click', exportChat);
+        // Personalize welcome + render missions
+        setTimeout(() => { personalizeWelcome(); renderMissionsPanel(); }, 300);
     }
 
     function setupInput() {
@@ -48,17 +50,40 @@ const Chat = (() => {
     async function handleChatRequest(text) {
         const msgEl = addMessage('nexus', '', true);
         const bubble = msgEl.querySelector('.message-bubble');
+
+        // Smart Intent Router — auto-detect which agent should handle this
+        let routedFeature = 'chat';
+        if (typeof IntentRouter !== 'undefined') {
+            const intent = IntentRouter.route(text);
+            if (intent.score >= 2) {
+                routedFeature = intent.id;
+                // Show agent badge above the response
+                const badge = document.createElement('div');
+                badge.className = 'agent-badge';
+                badge.textContent = IntentRouter.getAgentLabel(intent.id);
+                msgEl.querySelector('.message-content')?.prepend(badge);
+            }
+        }
+
         let full = '';
-        for await (const chunk of Nexus.stream('chat', text)) {
+        for await (const chunk of Nexus.stream(routedFeature, text)) {
             full += chunk; bubble.innerHTML = renderMd(full); scrollBottom();
         }
         bubble.innerHTML = renderMd(full); addCopyBtns(bubble); addActions(msgEl, full);
         scrollBottom(); Voice.speak(full); saveCurrent(); updateHistory();
+
         // Memory: extract facts from this exchange
         if (typeof Memory !== 'undefined') {
             Memory.extractFromConversation(text, full).catch(() => {});
-            // Show quick action suggestions
-            showQuickActions(text, full, 'chat');
+            showQuickActions(text, full, routedFeature);
+        }
+        // Auto-complete daily mission
+        if (typeof Missions !== 'undefined') {
+            const m = Missions.checkAutoComplete('chat_message');
+            if (m) {
+                try { Features.addXP(m.xp, `Mission: ${m.task}`); } catch(e) {}
+                Toast.show(`🎯 Mission complete: ${m.task} (+${m.xp} XP)`, 'xp');
+            }
         }
     }
 
@@ -213,6 +238,59 @@ const Chat = (() => {
         });
         document.querySelector('.messages-area')?.appendChild(container);
         scrollBottom();
+    }
+
+    // Personalize welcome screen chips based on user memory
+    function personalizeWelcome() {
+        if (typeof Memory === 'undefined') return;
+        const profile = Memory.getProfile();
+        if (!profile || !profile.interaction_count) return; // Skip for brand new users
+
+        const chips = document.querySelector('.welcome-chips');
+        if (!chips) return;
+
+        const personalized = [];
+        if (profile.weaknesses?.length) {
+            personalized.push({ emoji: '🎯', label: `Practice ${profile.weaknesses[0]}`, prompt: `Help me practice ${profile.weaknesses[0]}` });
+        }
+        if (profile.goals?.length) {
+            personalized.push({ emoji: '🚀', label: profile.goals[0].slice(0, 25), prompt: `Help me work toward ${profile.goals[0]}` });
+        }
+        if (profile.target_companies?.length) {
+            personalized.push({ emoji: '🏢', label: `${profile.target_companies[0]} prep`, prompt: `Help me prepare for ${profile.target_companies[0]} interview` });
+        }
+        if (profile.recent_topics?.length) {
+            const topic = profile.recent_topics[profile.recent_topics.length - 1];
+            personalized.push({ emoji: '🔄', label: `Continue ${topic}`, prompt: `Let's continue learning about ${topic}` });
+        }
+
+        if (!personalized.length) return;
+
+        // Replace first N static chips with personalized ones
+        const existingChips = chips.querySelectorAll('.welcome-chip');
+        personalized.forEach((p, i) => {
+            if (existingChips[i]) {
+                existingChips[i].innerHTML = `<span class="chip-emoji">${p.emoji}</span>${p.label}`;
+                existingChips[i].dataset.prompt = p.prompt;
+            }
+        });
+    }
+
+    // Render daily missions panel on welcome screen
+    function renderMissionsPanel() {
+        if (typeof Missions === 'undefined') return;
+        const welcome = document.querySelector('.welcome-screen');
+        if (!welcome) return;
+
+        // Don't duplicate
+        if (welcome.querySelector('.missions-container')) return;
+
+        Missions.generate();
+        const html = Missions.renderHTML();
+        const wrapper = document.createElement('div');
+        wrapper.className = 'missions-wrapper';
+        wrapper.innerHTML = html;
+        welcome.appendChild(wrapper);
     }
 
     return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom};
