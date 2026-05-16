@@ -65,6 +65,17 @@ const Chat = (() => {
             }
         }
 
+        // RAG grounding indicator
+        if (typeof RAG !== 'undefined') {
+            const ragResults = RAG.retrieve(text, 3);
+            if (ragResults.length) {
+                const ragBadge = document.createElement('div');
+                ragBadge.className = 'agent-badge rag-badge';
+                ragBadge.textContent = `📚 Grounded (${ragResults.length} sources)`;
+                msgEl.querySelector('.message-content')?.prepend(ragBadge);
+            }
+        }
+
         let full = '';
         for await (const chunk of Nexus.stream(routedFeature, text)) {
             full += chunk; bubble.innerHTML = renderMd(full); scrollBottom();

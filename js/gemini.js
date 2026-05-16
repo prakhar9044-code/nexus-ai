@@ -215,7 +215,9 @@ When the user tells you what they did, award XP appropriately and show their upd
         const extra = extraContext ? '\nContext: ' + extraContext : '';
         // Inject persistent memory context
         const memoryCtx = (typeof Memory !== 'undefined') ? Memory.buildContext() : '';
-        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx;
+        // Inject RAG knowledge retrieval
+        const ragCtx = (typeof RAG !== 'undefined') ? RAG.buildContext(userMessage) : '';
+        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx;
 
         const requestBody = {
             model: MODEL,
