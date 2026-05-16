@@ -245,15 +245,47 @@
 </div>
 </footer>
 
+<!-- FLOATING 3D SHAPES -->
+<div class="float-shapes">
+<div class="fshape"></div><div class="fshape"></div><div class="fshape"></div>
+<div class="fshape"></div><div class="fshape"></div><div class="fshape"></div>
+</div>
+
+<!-- CHATBOT WIDGET -->
+<button class="chatbot-fab" id="chatbot-fab" aria-label="Open chat">💬<span class="chatbot-fab-dot"></span></button>
+<div class="chatbot-panel" id="chatbot-panel">
+    <div class="cb-header">
+        <div class="cb-header-av">N</div>
+        <div class="cb-header-info"><h4>Nexus AI</h4><span>🟢 Always online</span></div>
+        <button class="cb-header-close" id="cb-close">✕</button>
+    </div>
+    <div class="cb-messages" id="cb-messages">
+        <div class="cb-msg">
+            <div class="cb-msg-av">N</div>
+            <div class="cb-bubble">Hey! 👋 I'm Nexus. Ask me anything about our platform, features, pricing, or how to get started!</div>
+        </div>
+    </div>
+    <div class="cb-quick" id="cb-quick">
+        <button class="cb-chip" data-q="What is Nexus AI?">What is Nexus?</button>
+        <button class="cb-chip" data-q="What features do you have?">Features</button>
+        <button class="cb-chip" data-q="Is it free?">Pricing</button>
+        <button class="cb-chip" data-q="How do I get started?">Get started</button>
+    </div>
+    <div class="cb-input-area">
+        <input class="cb-input" id="cb-input" placeholder="Ask me anything..." autocomplete="off">
+        <button class="cb-send" id="cb-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+    </div>
+</div>
+
 <script>
 const nav=document.getElementById('nav');
 window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
 document.getElementById('hamburger').addEventListener('click',function(){document.getElementById('nav-links').classList.toggle('open');this.classList.toggle('open');});
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});document.getElementById('nav-links').classList.remove('open');document.getElementById('hamburger').classList.remove('open');});});
 
-// Scroll animations
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const d=e.target.dataset.delay||0;setTimeout(()=>e.target.classList.add('visible'),d*80);}});},{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
-document.querySelectorAll('.anim-scroll').forEach(el=>obs.observe(el));
+// Scroll animations with stagger
+const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){const d=e.target.dataset.delay||0;setTimeout(()=>e.target.classList.add('visible'),d*80+i*40);}});},{threshold:0.1,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.anim-scroll').forEach((el,i)=>{el.dataset.delay=el.dataset.delay||Math.floor(i/4);obs.observe(el);});
 
 // Counters
 const cObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const el=e.target,t=+el.dataset.target;let c=0;const s=Math.ceil(t/60);const tm=setInterval(()=>{c+=s;if(c>=t){c=t;clearInterval(tm);}el.textContent=c>=1000?(c/1000).toFixed(1)+'K+':c+(t===98?'%':'+');},25);cObs.unobserve(el);}});},{threshold:0.5});
@@ -268,11 +300,141 @@ setTimeout(typeIt,2000);
 
 // Particles
 const pc=document.getElementById('particles');
-if(pc)for(let i=0;i<25;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${4+Math.random()*6}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;`;pc.appendChild(p);}
+if(pc)for(let i=0;i<35;i++){const p=document.createElement('div');p.className='particle';p.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${4+Math.random()*6}s;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;`;pc.appendChild(p);}
 
 // XP bar animation
 const xpObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.querySelector('.sv-xp-fill')?.style.setProperty('width','75%');xpObs.unobserve(e.target);}});},{threshold:0.5});
 document.querySelectorAll('.sv-xp').forEach(el=>xpObs.observe(el));
+
+// ======== 3D TILT EFFECT (mouse-tracking on cards) ========
+document.querySelectorAll('.sv-card, .up-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.transform = `translateY(-6px) rotateX(${-y * 10}deg) rotateY(${x * 10}deg) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+    });
+});
+
+// ======== PARALLAX SCROLL ========
+let ticking = false;
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
+            const orbs = document.querySelectorAll('.h-orb');
+            orbs.forEach((orb, i) => {
+                const speed = 0.05 + i * 0.02;
+                orb.style.transform = `translateY(${scrollY * speed}px)`;
+            });
+            ticking = false;
+        });
+        ticking = true;
+    }
+});
+
+// ======== CHATBOT ========
+const chatbotFab = document.getElementById('chatbot-fab');
+const chatbotPanel = document.getElementById('chatbot-panel');
+const cbClose = document.getElementById('cb-close');
+const cbMessages = document.getElementById('cb-messages');
+const cbInput = document.getElementById('cb-input');
+const cbSend = document.getElementById('cb-send');
+const cbQuick = document.getElementById('cb-quick');
+
+// Toggle
+chatbotFab.addEventListener('click', () => {
+    chatbotPanel.classList.toggle('open');
+    chatbotFab.classList.toggle('open');
+    chatbotFab.textContent = chatbotPanel.classList.contains('open') ? '✕' : '💬';
+    if (chatbotPanel.classList.contains('open')) cbInput.focus();
+});
+cbClose.addEventListener('click', () => {
+    chatbotPanel.classList.remove('open');
+    chatbotFab.classList.remove('open');
+    chatbotFab.innerHTML = '💬<span class="chatbot-fab-dot"></span>';
+});
+
+// Knowledge base for chatbot
+const CB_ANSWERS = {
+    'what is nexus': `Nexus AI is your **AI-powered Career Strategist & Study Assistant**! 🚀\n\nIt combines 17+ intelligent features including Mock Interviews, AI Teacher, Resume Builder, Skill Analysis, and more — all powered by Google's Gemini AI.\n\nIt's designed to help students and professionals level up their careers.`,
+    'features': `Here are our **17+ features**:\n\n🧠 AI Chat — Smart career guidance\n🎤 Mock Interview — Practice & get scored\n👨‍🏫 AI Teacher — Learn any topic\n📄 Resume Builder — ATS-optimized\n📊 Skill Analysis — Find your gaps\n🎯 Career Path — Personalized roadmap\n💻 Coding Practice — LeetCode-style\n📅 Roadmaps — Timeline planner\n🏆 XP System — Gamified learning\n🖼️ Image Generation — AI visuals\n\n...and many more! Try it free →`,
+    'free': `Yes! **Nexus AI is completely free** to use! 🎉\n\nNo credit card required. No hidden charges. All 17+ features are available to every user.\n\nJust sign up with Google, GitHub, or email and start using it immediately.`,
+    'pricing': `**Nexus AI is 100% free!** 🎉\n\nAll features including AI Chat, Mock Interviews, Resume Builder, and the XP system are completely free.\n\nNo subscriptions, no paywalls. Built by Prakhar for students everywhere.`,
+    'get started': `Getting started is super easy! 🚀\n\n**3 simple steps:**\n1. Click "Get Started" → Sign up (Google/GitHub/Email)\n2. Complete the quick onboarding (pick your goals)\n3. Start chatting with Nexus AI!\n\nThe AI personalizes everything based on your goals from day 1.`,
+    'interview': `Our **Mock Interview** feature is loved by users! 🎤\n\n• Company-specific questions (Google, Amazon, Microsoft, etc.)\n• HR, Technical, and System Design rounds\n• Real-time feedback & scoring after each answer\n• Detailed scorecard with improvement tips\n• Unlimited practice sessions\n\nUsers have reported landing jobs at top companies after practicing!`,
+    'resume': `The **Resume Builder** creates ATS-optimized resumes in minutes! 📄\n\n• AI-powered content optimization\n• ATS score checker (get 90%+ scores)\n• Action verb suggestions\n• Project ideas that match your target role\n• Export-ready format\n\nOne user got 3 interview calls in the same week!`,
+    'who made': `Nexus AI was built by **Prakhar** — a passionate developer creating AI tools for students and professionals. 💻\n\nThe platform is powered by Google's Gemini AI and hosted on Netlify.`,
+    'contact': `You can reach us through:\n\n🐙 **GitHub**: github.com/prakhar9044-code\n💼 **LinkedIn**: Connect with Prakhar\n📧 **Email**: Through the platform\n\nWe'd love to hear from you!`,
+    'mobile': `Nexus AI works great on mobile! 📱\n\nIt's a **Progressive Web App (PWA)**, so you can:\n• Use it directly in your browser\n• Add to home screen for app-like experience\n• Works offline for basic features\n\nA native iOS & Android app is coming in Q3 2026!`,
+    'teacher': `The **AI Teacher** is like having a personal tutor 24/7! 👨‍🏫\n\n• Adapts to YOUR skill level automatically\n• Teaches with analogies & real-world examples\n• Interactive quizzes after each concept\n• Tracks your understanding level\n• From DSA to System Design — any topic!\n\nStudents say it's better than most online courses.`,
+};
+
+function findAnswer(msg) {
+    const lower = msg.toLowerCase();
+    for (const [key, answer] of Object.entries(CB_ANSWERS)) {
+        const words = key.split(/\s+/);
+        if (words.every(w => lower.includes(w))) return answer;
+    }
+    // Fallback smart matching
+    if (lower.includes('interview') || lower.includes('mock')) return CB_ANSWERS['interview'];
+    if (lower.includes('resume') || lower.includes('cv')) return CB_ANSWERS['resume'];
+    if (lower.includes('feature')) return CB_ANSWERS['features'];
+    if (lower.includes('price') || lower.includes('cost') || lower.includes('free') || lower.includes('pay')) return CB_ANSWERS['pricing'];
+    if (lower.includes('start') || lower.includes('sign') || lower.includes('register') || lower.includes('join')) return CB_ANSWERS['get started'];
+    if (lower.includes('mobile') || lower.includes('app') || lower.includes('phone') || lower.includes('android') || lower.includes('ios')) return CB_ANSWERS['mobile'];
+    if (lower.includes('teach') || lower.includes('learn') || lower.includes('tutor')) return CB_ANSWERS['teacher'];
+    if (lower.includes('who') || lower.includes('made') || lower.includes('built') || lower.includes('creator') || lower.includes('prakhar')) return CB_ANSWERS['who made'];
+    if (lower.includes('contact') || lower.includes('email') || lower.includes('reach') || lower.includes('support')) return CB_ANSWERS['contact'];
+    if (lower.includes('nexus') || lower.includes('what is') || lower.includes('about')) return CB_ANSWERS['what is nexus'];
+    return `Great question! 😊 I might not have the specific answer, but our AI inside the app definitely does!\n\n**Try these:**\n• Click "Get Started" to use the full AI\n• Ask about features, pricing, or getting started\n• Or ask about specific tools like Mock Interview, Resume Builder, etc.`;
+}
+
+function addCbMsg(text, isUser = false) {
+    const div = document.createElement('div');
+    div.className = 'cb-msg' + (isUser ? ' user' : '');
+    const formatted = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    div.innerHTML = isUser
+        ? `<div class="cb-bubble">${formatted}</div>`
+        : `<div class="cb-msg-av">N</div><div class="cb-bubble">${formatted}</div>`;
+    cbMessages.appendChild(div);
+    cbMessages.scrollTop = cbMessages.scrollHeight;
+}
+
+function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'cb-msg cb-typing-msg';
+    div.innerHTML = '<div class="cb-msg-av">N</div><div class="cb-typing"><i></i><i></i><i></i></div>';
+    cbMessages.appendChild(div);
+    cbMessages.scrollTop = cbMessages.scrollHeight;
+    return div;
+}
+
+function handleCbSend() {
+    const text = cbInput.value.trim();
+    if (!text) return;
+    addCbMsg(text, true);
+    cbInput.value = '';
+    cbQuick.style.display = 'none';
+    const typing = showTyping();
+    setTimeout(() => {
+        typing.remove();
+        const answer = findAnswer(text);
+        addCbMsg(answer);
+    }, 800 + Math.random() * 600);
+}
+
+cbSend.addEventListener('click', handleCbSend);
+cbInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleCbSend(); });
+cbQuick.querySelectorAll('.cb-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        cbInput.value = chip.dataset.q;
+        handleCbSend();
+    });
+});
 </script>
 </body>
 </html>
