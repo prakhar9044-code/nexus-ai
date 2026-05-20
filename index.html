@@ -177,6 +177,13 @@
 </div>
 <button class="btn-secondary" id="force-sync-btn" style="width:100%">🔄 Force Sync Now</button>
 </div>
+<div class="settings-section"><h3>🔔 Notifications & Reminders</h3>
+<div style="font-size:0.75rem;color:var(--text-tertiary);margin-bottom:8px;">Smart alerts to keep you on track. Quiet hours: 10 PM — 8 AM.</div>
+<div class="setting-row"><div class="setting-label"><span>Study Reminders</span><span style="font-size:0.68rem;color:var(--text-tertiary)">Morning & afternoon</span></div><label class="toggle"><input type="checkbox" id="engage-study-toggle" checked><span class="toggle-slider"></span></label></div>
+<div class="setting-row"><div class="setting-label"><span>Streak Protection</span><span style="font-size:0.68rem;color:var(--text-tertiary)">Alert before streak breaks</span></div><label class="toggle"><input type="checkbox" id="engage-streak-toggle" checked><span class="toggle-slider"></span></label></div>
+<div class="setting-row"><div class="setting-label"><span>Mission Nudges</span><span style="font-size:0.68rem;color:var(--text-tertiary)">Remind incomplete missions</span></div><label class="toggle"><input type="checkbox" id="engage-mission-toggle" checked><span class="toggle-slider"></span></label></div>
+<div class="setting-row"><div class="setting-label"><span>Inactivity Alerts</span><span style="font-size:0.68rem;color:var(--text-tertiary)">Nudge after long breaks</span></div><label class="toggle"><input type="checkbox" id="engage-inactivity-toggle" checked><span class="toggle-slider"></span></label></div>
+</div>
 <div class="settings-section"><h3>Data</h3>
 <button class="btn-secondary" id="export-chat-btn" style="margin-bottom:8px">📥 Export Chat</button>
 <button class="btn-danger" id="clear-history-btn">Clear All History</button>
@@ -232,6 +239,7 @@
 <script src="js/agent-state.js?v=1"></script>
 <script src="js/context-manager.js?v=1"></script>
 <script src="js/sync.js?v=1"></script>
+<script src="js/engage.js?v=1"></script>
 <script src="js/gemini.js?v=8"></script>
 <script src="js/voice.js?v=7"></script>
 <script src="js/chat.js?v=7"></script>

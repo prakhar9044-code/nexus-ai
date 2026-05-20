@@ -41,6 +41,23 @@ const Settings = (() => {
             if (typeof Sync !== 'undefined') Sync.forceSync();
             else Toast.show('Sync not available', 'info');
         });
+        // Engagement Preferences (Phase 7)
+        const engageToggles = [
+            { id: 'engage-study-toggle', key: 'studyReminders' },
+            { id: 'engage-streak-toggle', key: 'streakAlerts' },
+            { id: 'engage-mission-toggle', key: 'missionNudges' },
+            { id: 'engage-inactivity-toggle', key: 'inactivityAlerts' },
+        ];
+        engageToggles.forEach(({ id, key }) => {
+            document.getElementById(id)?.addEventListener('change', e => {
+                if (typeof Engage !== 'undefined') {
+                    const prefs = Engage.getPrefs();
+                    prefs[key] = e.target.checked;
+                    Engage.savePrefs(prefs);
+                    Toast.show(`${e.target.checked ? '✅' : '🔕'} ${key.replace(/([A-Z])/g, ' $1')} ${e.target.checked ? 'enabled' : 'disabled'}`, 'info');
+                }
+            });
+        });
     }
 
     function load() {
@@ -61,6 +78,14 @@ const Settings = (() => {
         if(el('api-key-input')) el('api-key-input').value = localStorage.getItem('nexus_api_key')||'';
         if(el('timestamps-toggle')) el('timestamps-toggle').checked = localStorage.getItem('nexus_timestamps')!=='false';
         document.body.classList.toggle('hide-timestamps', localStorage.getItem('nexus_timestamps')==='false');
+        // Load engagement preferences (Phase 7)
+        if (typeof Engage !== 'undefined') {
+            const prefs = Engage.getPrefs();
+            if(el('engage-study-toggle')) el('engage-study-toggle').checked = prefs.studyReminders;
+            if(el('engage-streak-toggle')) el('engage-streak-toggle').checked = prefs.streakAlerts;
+            if(el('engage-mission-toggle')) el('engage-mission-toggle').checked = prefs.missionNudges;
+            if(el('engage-inactivity-toggle')) el('engage-inactivity-toggle').checked = prefs.inactivityAlerts;
+        }
     }
 
     function applyTheme() {

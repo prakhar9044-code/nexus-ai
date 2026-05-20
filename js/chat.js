@@ -42,6 +42,8 @@ const Chat = (() => {
             }
             // Auto XP: +5 for chat interaction
             awardAutoXP(5, 'Chat interaction');
+            // Track activity for Engagement Engine (Phase 7)
+            if (typeof Engage !== 'undefined') Engage.trackActivity();
         } catch (err) {
             addMessage('nexus', '⚠️ ' + err.message); Toast.show(err.message, 'error');
         } finally { showTyping(false); isProcessing = false; }

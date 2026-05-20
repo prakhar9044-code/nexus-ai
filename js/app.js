@@ -343,10 +343,17 @@ const App = (() => {
                 Chat.init();
                 Router.go('chat');
                 Settings.applyTheme();
+                // Initialize Engagement Engine (Phase 7)
+                if (typeof Engage !== 'undefined') Engage.init();
 
-                // Welcome notification
+                // Smart welcome notification (Phase 7 enhanced)
                 const name = user.displayName || 'there';
-                Notify.add('info', `Welcome back, ${name}!`, 'Ready to learn and grow today? 🚀', '👋');
+                if (typeof Engage !== 'undefined') {
+                    const greet = Engage.getSmartGreeting();
+                    Notify.add('info', greet.greeting, 'Ready to learn and grow today? 🚀' + (greet.suffix ? ' ' + greet.suffix : ''), '👋');
+                } else {
+                    Notify.add('info', `Welcome back, ${name}!`, 'Ready to learn and grow today? 🚀', '👋');
+                }
                 if (streak > 1) {
                     Notify.add('streak', `🔥 ${streak}-day streak!`, `You've been consistent for ${streak} days. Keep it up!`, '🔥');
                 }
