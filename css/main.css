@@ -699,11 +699,11 @@ body {
 }
 .fnav-collapse-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(-50%) scale(1.15); }
 
-.feature-nav { position: relative; transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease; }
+.feature-nav { position: relative; transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease; overflow-x: visible !important; }
 .feature-nav.collapsed {
     width: 0 !important; min-width: 0 !important;
     padding: 0; border: none;
-    overflow: visible;
+    overflow: visible !important;
 }
 .feature-nav.collapsed > *:not(.fnav-collapse-btn) {
     opacity: 0; pointer-events: none; overflow: hidden; height: 0; margin: 0; padding: 0;

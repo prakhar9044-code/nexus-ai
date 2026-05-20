@@ -10,7 +10,8 @@
     display: flex; flex-direction: column; align-items: stretch;
     padding: 12px 8px; flex-shrink: 0; z-index: 200;
     transition: all var(--transition-smooth);
-    overflow-y: auto; overflow-x: hidden;
+    overflow-y: auto; overflow-x: visible;
+    position: relative;
 }
 .feature-nav::-webkit-scrollbar { width: 3px; }
 .feature-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
