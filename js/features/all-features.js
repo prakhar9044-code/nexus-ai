@@ -205,6 +205,8 @@ const Features = (() => {
         localStorage.setItem('nexus_xp_log', JSON.stringify(log));
         // Save to Firestore (async, non-blocking)
         DB.updateXP(amount, reason).catch(() => {});
+        // Trigger Sync Engine (Phase 6)
+        if (typeof Sync !== 'undefined') Sync.onXPChange();
         const lb = getLevel(before), la = getLevel(after);
         if (la.level > lb.level) {
             // Full achievement popup for level up!

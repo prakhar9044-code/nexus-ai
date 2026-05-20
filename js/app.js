@@ -327,6 +327,8 @@ const App = (() => {
             // Load AI Memory profile
             if (typeof Memory !== 'undefined') Memory.load().catch(() => {});
             const streak = await DB.updateStreak();
+            // Initialize Firestore Sync Engine (Phase 6)
+            if (typeof Sync !== 'undefined') Sync.init().catch(() => {});
 
             Preloader.init();
             setTimeout(() => {

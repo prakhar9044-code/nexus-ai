@@ -128,6 +128,8 @@ const Missions = (() => {
     function save(date) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(missions));
         localStorage.setItem(DATE_KEY, date);
+        // Trigger Sync Engine (Phase 6)
+        if (typeof Sync !== 'undefined') Sync.onMissionChange();
     }
 
     // Render missions panel HTML

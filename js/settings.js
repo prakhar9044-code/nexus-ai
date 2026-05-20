@@ -7,7 +7,15 @@ const Settings = (() => {
     ];
 
     function init() { load(); listen(); renderColors(); applyTheme(); populateVoices(); }
-    function open() { document.getElementById('settings-modal').classList.add('active'); }
+    function open() {
+        document.getElementById('settings-modal').classList.add('active');
+        // Update sync status (Phase 6)
+        const infoEl = document.getElementById('sync-info');
+        if (infoEl && typeof Sync !== 'undefined') {
+            const s = Sync.getStatus();
+            infoEl.textContent = `${s.listeners} channels • Last sync: ${s.lastSync}`;
+        }
+    }
     function close() { document.getElementById('settings-modal').classList.remove('active'); }
 
     function listen() {
@@ -28,6 +36,11 @@ const Settings = (() => {
         document.getElementById('user-level-select')?.addEventListener('change', e => { localStorage.setItem('nexus_user_level', e.target.value); const labels = {kid:'🧒 Kid mode',highschool:'🎓 High School',college:'🏫 College',professional:'💼 Professional'}; Toast.show('Level: ' + (labels[e.target.value]||e.target.value), 'success'); });
         document.getElementById('clear-history-btn')?.addEventListener('click', () => { if(confirm('Clear all chat history?')){Chat.clearAllChats();Toast.show('History cleared','info');close();} });
         document.getElementById('export-chat-btn')?.addEventListener('click', () => Chat.exportChat());
+        // Sync Engine (Phase 6)
+        document.getElementById('force-sync-btn')?.addEventListener('click', () => {
+            if (typeof Sync !== 'undefined') Sync.forceSync();
+            else Toast.show('Sync not available', 'info');
+        });
     }
 
     function load() {
