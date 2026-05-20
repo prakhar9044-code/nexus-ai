@@ -119,7 +119,11 @@ const Features = (() => {
         dashboard: () => {
             const el = document.getElementById('panel-dashboard');
             const body = el.querySelector('.feature-body');
-            renderDashboard(body);
+            if (typeof Dashboard !== 'undefined') {
+                Dashboard.render(body);
+            } else {
+                renderDashboard(body);
+            }
         },
 
         accountability: () => {
