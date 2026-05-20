@@ -499,12 +499,18 @@ const App = (() => {
         const collapseBtn = document.querySelector('.fnav-collapse-btn');
         if (collapseBtn) {
             const isCollapsed = localStorage.getItem('nexus_nav_collapsed') === '1';
-            if (isCollapsed) featureNav?.classList.add('collapsed');
+            if (isCollapsed) {
+                featureNav?.classList.add('collapsed');
+                collapseBtn.style.left = '8px';
+            } else {
+                collapseBtn.style.left = '186px';
+            }
             collapseBtn.addEventListener('click', () => {
                 featureNav?.classList.toggle('collapsed');
                 const collapsed = featureNav?.classList.contains('collapsed');
                 localStorage.setItem('nexus_nav_collapsed', collapsed ? '1' : '0');
                 collapseBtn.textContent = collapsed ? '»' : '«';
+                collapseBtn.style.left = collapsed ? '8px' : '186px';
             });
         }
     }
