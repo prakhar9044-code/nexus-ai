@@ -11,6 +11,7 @@ const Toast = (() => {
     }
     return { show };
 })();
+function showToast(msg, type, dur) { Toast.show(msg, type, dur); }
 
 // Premium Notification System + Push Notifications
 const Notify = (() => {
@@ -315,6 +316,9 @@ const Router = (() => {
 
 const App = (() => {
     function init() {
+        // Init error handler first (Phase 8)
+        if (typeof ErrorHandler !== 'undefined') ErrorHandler.init();
+
         // Auth gate — redirect if not logged in
         Auth.onAuthChange(async (user) => {
             if (!user) {
@@ -346,6 +350,12 @@ const App = (() => {
                 // Initialize Engagement Engine (Phase 7)
                 if (typeof Engage !== 'undefined') Engage.init();
 
+                // Phase 8 modules
+                if (typeof Voice !== 'undefined' && Voice.init) Voice.init();
+                if (typeof FileHandler !== 'undefined') FileHandler.init();
+                if (typeof I18n !== 'undefined') I18n.init();
+                if (typeof Social !== 'undefined') Social.init();
+
                 // Smart welcome notification (Phase 7 enhanced)
                 const name = user.displayName || 'there';
                 if (typeof Engage !== 'undefined') {
@@ -365,7 +375,6 @@ const App = (() => {
             }, 100);
         });
     }
-
     function setupUserUI(user) {
         // Header avatar
         const avatar = document.getElementById('header-avatar');
@@ -423,6 +432,19 @@ const App = (() => {
         document.getElementById('dropdown-logout-btn')?.addEventListener('click', () => {
             dropdown.classList.remove('active');
             Auth.logout();
+        });
+        // Phase 8: Profile & Share
+        document.getElementById('dropdown-profile-btn')?.addEventListener('click', () => {
+            dropdown.classList.remove('active');
+            if (typeof Social !== 'undefined') Social.showProfile();
+        });
+        document.getElementById('dropdown-share-btn')?.addEventListener('click', () => {
+            dropdown.classList.remove('active');
+            if (typeof Social !== 'undefined' && typeof Chat !== 'undefined') {
+                const chatId = Chat.getCurrentChatId ? Chat.getCurrentChatId() : null;
+                if (chatId) Social.shareChat(chatId);
+                else Toast.show('Start a conversation first!', 'info');
+            }
         });
     }
 

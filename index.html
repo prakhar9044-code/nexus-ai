@@ -156,7 +156,7 @@
 <input type="text" class="setting-input" id="student-name-input" placeholder="Enter your name..." style="font-family:var(--font-body);margin-top:4px;">
 <div class="setting-row" style="margin-top:12px"><div class="setting-label"><span>I am a...</span><span style="font-size:0.7rem;color:var(--text-tertiary)">Nexus adapts to your level</span></div><select class="setting-select" id="user-level-select"><option value="kid">🧒 Class 5-8 Student</option><option value="highschool">🎓 High School (9-12)</option><option value="college" selected>🏫 College Student</option><option value="professional">💼 Working Professional</option></select></div>
 <div class="setting-row" style="margin-top:8px"><div class="setting-label"><span>Dark Mode</span></div><label class="toggle"><input type="checkbox" id="theme-toggle"><span class="toggle-slider"></span></label></div>
-<div class="setting-row"><div class="setting-label"><span>Language</span></div><select class="setting-select" id="lang-select"><option value="en">English</option><option value="hi">हिंदी (Hindi)</option></select></div>
+<div class="setting-row"><div class="setting-label"><span>Language</span></div><select class="setting-select" id="lang-select"><option value="en">🇺🇸 English</option><option value="hi">🇮🇳 हिंदी (Hindi)</option><option value="es">🇪🇸 Español</option><option value="fr">🇫🇷 Français</option><option value="de">🇩🇪 Deutsch</option></select></div>
 <div class="setting-row"><div class="setting-label"><span>Accent Color</span></div></div>
 <div class="color-options" id="accent-colors" style="margin-top:4px;"></div>
 <div class="setting-row" style="margin-top:8px"><div class="setting-label"><span>Font Size</span></div><select class="setting-select" id="font-size-select"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option></select></div>
@@ -219,7 +219,9 @@
 <!-- User Menu Dropdown -->
 <div class="user-dropdown" id="user-dropdown">
 <div class="user-dropdown-header" id="user-dropdown-info"></div>
+<button class="user-dropdown-btn" id="dropdown-profile-btn">👤 My Profile</button>
 <button class="user-dropdown-btn" id="dropdown-settings-btn">⚙️ Settings</button>
+<button class="user-dropdown-btn" id="dropdown-share-btn">📤 Share Chat</button>
 <button class="user-dropdown-btn" id="dropdown-bug-btn">🐛 Report Bug</button>
 <button class="user-dropdown-btn danger" id="dropdown-logout-btn">🚪 Log Out</button>
 </div>
