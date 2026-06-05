@@ -920,3 +920,60 @@ body {
         max-height: 60vh; border-radius: 20px 20px 0 0; }
     .toast-container { top: auto; bottom: 16px; left: 16px; right: 16px; max-width: 100%; }
 }
+
+/* ============================================
+   Phase 9 — Accessibility
+   ============================================ */
+
+/* Focus-visible: keyboard navigation outlines */
+*:focus-visible {
+    outline: 2px solid var(--accent, #4a6cf7);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Remove focus ring on mouse clicks */
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Reduced motion: respect user preference */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .preloader { display: none; }
+}
+
+/* High contrast mode */
+[data-high-contrast="true"] {
+    --border: #888 !important;
+    --text-tertiary: #999 !important;
+    --bg-hover: rgba(128,128,128,0.2) !important;
+}
+[data-high-contrast="true"] button,
+[data-high-contrast="true"] a {
+    text-decoration: underline;
+}
+[data-high-contrast="true"] .header-btn {
+    border: 1px solid var(--border);
+}
+
+/* Skip to content link (screen readers) */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 8px 16px;
+    z-index: 10000;
+    font-size: 0.85rem;
+    border-radius: 0 0 8px 0;
+    transition: top 0.3s;
+}
+.skip-link:focus {
+    top: 0;
+}

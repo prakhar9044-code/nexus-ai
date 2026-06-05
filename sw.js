@@ -1,5 +1,5 @@
 /* NEXUS v3.0 — Service Worker (Offline + Install + Push Notifications) */
-const CACHE_NAME = 'nexus-v3-cache';
+const CACHE_NAME = 'nexus-v10-cache';
 const ASSETS = [
   '/',
   '/index.html',
@@ -13,6 +13,7 @@ const ASSETS = [
   '/css/features.css',
   '/css/preloader.css',
   '/css/login.css',
+  '/css/dashboard.css',
   '/js/app.js',
   '/js/chat.js',
   '/js/gemini.js',
@@ -22,6 +23,15 @@ const ASSETS = [
   '/js/preloader.js',
   '/js/firebase-config.js',
   '/js/database.js',
+  '/js/dashboard.js',
+  '/js/error-handler.js',
+  '/js/file-handler.js',
+  '/js/i18n.js',
+  '/js/social.js',
+  '/js/search.js',
+  '/js/templates.js',
+  '/js/themes.js',
+  '/js/shortcuts.js',
   '/js/features/feature-chat.js',
   '/js/features/all-features.js'
 ];
