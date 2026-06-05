@@ -331,5 +331,5 @@ const Chat = (() => {
         welcome.appendChild(wrapper);
     }
 
-    return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom};
+    return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom,getCurrentChatId:()=>currentChatId};
 })();
