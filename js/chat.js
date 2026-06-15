@@ -251,7 +251,7 @@ const Chat = (() => {
     function loadCurrentChat(){currentChatId=generateId();updateHistory();}
     function deleteChat(id){const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');delete c[id];localStorage.setItem('nexus_chats',JSON.stringify(c));DB.deleteChat(id).catch(()=>{});if(id===currentChatId)newChat();updateHistory();}
     function clearAllChats(){localStorage.removeItem('nexus_chats');DB.clearAllChats().catch(()=>{});Nexus.resetConversation('chat');newChat();}
-    function updateHistory(){const ct=document.querySelector('.chat-history');if(!ct)return;const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');const s=Object.values(c).sort((a,b)=>b.updatedAt-a.updatedAt);ct.innerHTML='<div class="chat-history-title">Recent</div>';if(!s.length){ct.innerHTML+='<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:.78rem">No chats yet</div>';return;}s.forEach(ch=>{const it=document.createElement('div');it.className=`history-item ${ch.id===currentChatId?'active':''}`;it.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${esc(ch.title)}</span><button class="delete-chat" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`;it.addEventListener('click',e=>{if(!e.target.closest('.delete-chat')){Router.go('chat');loadChat(ch.id);}});it.querySelector('.delete-chat').addEventListener('click',e=>{e.stopPropagation();deleteChat(ch.id);});ct.appendChild(it);});}
+    function updateHistory(){const ct=document.querySelector('.chat-history');if(!ct)return;const c=JSON.parse(localStorage.getItem('nexus_chats')||'{}');const pinned=JSON.parse(localStorage.getItem('nexus_pinned_chats')||'[]');const all=Object.values(c).sort((a,b)=>b.updatedAt-a.updatedAt);const pinnedChats=all.filter(ch=>pinned.includes(ch.id));const unpinnedChats=all.filter(ch=>!pinned.includes(ch.id));const sorted=[...pinnedChats,...unpinnedChats];ct.innerHTML='<div class="chat-history-title">Recent</div>';if(!sorted.length){ct.innerHTML+='<div style="padding:16px;text-align:center;color:var(--text-tertiary);font-size:.78rem">No chats yet</div>';return;}sorted.forEach(ch=>{const isPinned=pinned.includes(ch.id);const it=document.createElement('div');it.className=`history-item ${ch.id===currentChatId?'active':''} ${isPinned?'pinned':''}`;it.innerHTML=`${isPinned?'<span style="font-size:0.7rem;margin-right:2px" title="Pinned">📌</span>':''}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${esc(ch.title)}</span><button class="pin-chat" title="${isPinned?'Unpin':'Pin'}" style="background:none;border:none;cursor:pointer;padding:2px 4px;font-size:0.7rem;opacity:0.5;transition:opacity 0.2s">${isPinned?'📌':'📍'}</button><button class="delete-chat" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`;it.addEventListener('click',e=>{if(!e.target.closest('.delete-chat')&&!e.target.closest('.pin-chat')){Router.go('chat');loadChat(ch.id);}});it.querySelector('.delete-chat').addEventListener('click',e=>{e.stopPropagation();deleteChat(ch.id);});it.querySelector('.pin-chat').addEventListener('click',e=>{e.stopPropagation();togglePin(ch.id);});ct.appendChild(it);});}
     function exportChat(){const ma=document.querySelector('.messages-area');if(!ma)return;let t='=== NEXUS Chat Export ===\nDate: '+new Date().toLocaleString()+'\n\n';ma.querySelectorAll('.message').forEach(m=>{const r=m.classList.contains('user-message')?'You':'Nexus';t+=`[${m.querySelector('.message-time')?.textContent||''}] ${r}:\n${m.querySelector('.message-bubble').textContent}\n\n`;});const b=new Blob([t],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`nexus-${new Date().toISOString().slice(0,10)}.txt`;a.click();URL.revokeObjectURL(u);Toast.show('Chat exported!','success');}
 
     function showQuickActions(userMsg, aiResp, featureId) {
@@ -331,5 +331,20 @@ const Chat = (() => {
         welcome.appendChild(wrapper);
     }
 
-    return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom,getCurrentChatId:()=>currentChatId};
+    function togglePin(chatId) {
+        let pinned = JSON.parse(localStorage.getItem('nexus_pinned_chats') || '[]');
+        const idx = pinned.indexOf(chatId);
+        if (idx >= 0) {
+            pinned.splice(idx, 1);
+            Toast.show('Chat unpinned', 'info');
+        } else {
+            if (pinned.length >= 5) { Toast.show('Max 5 pinned chats!', 'warning'); return; }
+            pinned.push(chatId);
+            Toast.show('📌 Chat pinned!', 'success');
+        }
+        localStorage.setItem('nexus_pinned_chats', JSON.stringify(pinned));
+        updateHistory();
+    }
+
+    return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom,getCurrentChatId:()=>currentChatId,togglePin};
 })();
