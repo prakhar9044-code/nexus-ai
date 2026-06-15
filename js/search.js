@@ -50,12 +50,13 @@ const Search = (() => {
             <div class="search-modal">
                 <div class="search-input-wrap">
                     <span class="search-icon">🔍</span>
-                    <input class="search-input" id="search-input" placeholder="Search messages, chats, bookmarks..." autocomplete="off">
+                    <input class="search-input" id="search-input" placeholder="Search messages... or type > for commands" autocomplete="off">
                 </div>
                 <div class="search-tabs">
                     <button class="search-tab active" data-tab="all">All</button>
                     <button class="search-tab" data-tab="messages">Messages</button>
                     <button class="search-tab" data-tab="bookmarks">⭐ Bookmarks</button>
+                    <button class="search-tab" data-tab="commands">⚡ Commands</button>
                 </div>
                 <div class="search-results" id="search-results">
                     <div class="search-empty"><div class="search-empty-icon">🔍</div>Type to search across all conversations</div>
@@ -114,6 +115,12 @@ const Search = (() => {
 
         if (activeTab === 'bookmarks') {
             renderBookmarks(query);
+            return;
+        }
+
+        // Command palette: `>` prefix or Commands tab
+        if (query.startsWith('>') || activeTab === 'commands') {
+            renderCommands(query.startsWith('>') ? query.substring(1).trim() : query);
             return;
         }
 
@@ -268,6 +275,58 @@ const Search = (() => {
             if (diff < 604800000) return d.toLocaleDateString([], { weekday: 'short' });
             return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
         } catch { return ''; }
+    }
+
+    function renderCommands(filter) {
+        const results = document.getElementById('search-results');
+        const commands = [
+            { icon: '💬', name: 'New Chat', desc: 'Start a new conversation', action: () => { if (typeof Chat !== 'undefined') { Chat.newChat(); Router.go('chat'); } } },
+            { icon: '⚙️', name: 'Settings', desc: 'Open settings panel', action: () => { if (typeof Settings !== 'undefined') Settings.open(); } },
+            { icon: '🎨', name: 'Theme Gallery', desc: 'Change app theme', action: () => { if (typeof Themes !== 'undefined') Themes.open(); } },
+            { icon: '🌙', name: 'Toggle Dark Mode', desc: 'Switch dark/light', action: () => { if (typeof Themes !== 'undefined') { const cur = document.documentElement.dataset.theme; Themes.applyTheme(cur === 'dark' ? 'light' : 'dark'); } } },
+            { icon: '📝', name: 'Templates', desc: 'Open prompt templates', action: () => { if (typeof Templates !== 'undefined') Templates.open(); } },
+            { icon: '📄', name: 'Export PDF', desc: 'Export chat as PDF', action: () => { if (typeof DocHelper !== 'undefined') DocHelper.printPDF(); } },
+            { icon: '📤', name: 'Export Chat', desc: 'Export as text file', action: () => { if (typeof Chat !== 'undefined') Chat.exportChat(); } },
+            { icon: '🗑️', name: 'Clear All Chats', desc: 'Delete all conversations', action: () => { if (confirm('Delete ALL chats?') && typeof Chat !== 'undefined') Chat.clearAllChats(); } },
+            { icon: '⌨️', name: 'Keyboard Shortcuts', desc: 'View all shortcuts', action: () => { if (typeof Shortcuts !== 'undefined') Shortcuts.open(); } },
+            { icon: '🧠', name: 'Memory Dashboard', desc: 'View stored memories', action: () => { Router.go('memory'); } },
+        ];
+        // Add persona commands
+        if (typeof Personas !== 'undefined') {
+            Object.values(Personas.getAll()).forEach(p => {
+                commands.push({ icon: p.icon, name: `Persona: ${p.name}`, desc: p.desc, action: () => Personas.setPersona(p.id) });
+            });
+        }
+
+        const lf = (filter || '').toLowerCase();
+        const filtered = lf ? commands.filter(c => c.name.toLowerCase().includes(lf) || c.desc.toLowerCase().includes(lf)) : commands;
+
+        if (!filtered.length) {
+            results.innerHTML = '<div class="search-empty"><div class="search-empty-icon">⚡</div>No commands match</div>';
+            return;
+        }
+
+        results.innerHTML = filtered.map(c => `
+            <div class="search-result command-result" data-cmd="${c.name}">
+                <span class="search-result-icon">${c.icon}</span>
+                <div class="search-result-content">
+                    <div class="search-result-title">${c.name}</div>
+                    <div class="search-result-preview">${c.desc}</div>
+                </div>
+                <span style="font-size:0.7rem;color:var(--text-tertiary)">Run ↵</span>
+            </div>
+        `).join('');
+
+        const cmdActions = {};
+        filtered.forEach(c => cmdActions[c.name] = c.action);
+
+        results.querySelectorAll('.command-result').forEach(el => {
+            el.addEventListener('click', () => {
+                close();
+                const fn = cmdActions[el.dataset.cmd];
+                if (fn) fn();
+            });
+        });
     }
 
     return { init, open, close, toggle, toggleBookmark };
