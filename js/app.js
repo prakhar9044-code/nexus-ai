@@ -392,6 +392,11 @@ const App = (() => {
                 if (typeof Themes !== 'undefined') Themes.init();
                 if (typeof Shortcuts !== 'undefined') Shortcuts.init();
 
+                // Phase 10 modules
+                if (typeof Personas !== 'undefined') Personas.init();
+                if (typeof MemoryViz !== 'undefined') MemoryViz.init();
+                if (typeof Suggestions !== 'undefined') Suggestions.init();
+
                 // Smart welcome notification (Phase 7 enhanced)
                 const name = user.displayName || 'there';
                 if (typeof Engage !== 'undefined') {

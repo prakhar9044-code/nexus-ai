@@ -225,7 +225,9 @@ When the user tells you what they did, award XP appropriately and show their upd
         const ragCtx = (typeof RAG !== 'undefined') ? RAG.buildContext(userMessage) : '';
         // Inject agent state (interview progress, coding streak, etc.)
         const agentCtx = (typeof AgentState !== 'undefined') ? AgentState.buildContext(featureId) : '';
-        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx;
+        // Phase 10: Inject active persona prompt (only for chat)
+        const personaCtx = (featureId === 'chat' && typeof Personas !== 'undefined') ? '\n\nPERSONA STYLE: ' + Personas.getSystemPrompt() : '';
+        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx + personaCtx;
 
         const requestBody = {
             model: MODEL,
