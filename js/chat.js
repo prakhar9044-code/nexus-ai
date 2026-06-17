@@ -345,6 +345,26 @@ const Chat = (() => {
         localStorage.setItem('nexus_pinned_chats', JSON.stringify(pinned));
         updateHistory();
     }
+    function forkChat(msgIndex) {
+        const chats = JSON.parse(localStorage.getItem('nexus_chats') || '{}');
+        const current = chats[currentChatId];
+        if (!current || !current.messages) { Toast.show('Nothing to fork', 'warning'); return; }
+        const forkedMessages = current.messages.slice(0, msgIndex + 1);
+        const forkId = 'chat_' + Date.now();
+        const forked = {
+            id: forkId,
+            title: '🔀 ' + (current.title || 'Chat').substring(0, 30),
+            messages: forkedMessages,
+            created: Date.now(),
+            updatedAt: Date.now(),
+            forkedFrom: currentChatId
+        };
+        chats[forkId] = forked;
+        localStorage.setItem('nexus_chats', JSON.stringify(chats));
+        loadChat(forkId);
+        updateHistory();
+        Toast.show('🔀 Conversation forked!', 'success');
+    }
 
-    return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom,getCurrentChatId:()=>currentChatId,togglePin};
+    return {init,handleSend,newChat,deleteChat,clearAllChats,updateHistoryList:updateHistory,exportChat,addMessage,scrollToBottom:scrollBottom,getCurrentChatId:()=>currentChatId,togglePin,forkChat};
 })();
