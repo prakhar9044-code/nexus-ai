@@ -397,6 +397,12 @@ const App = (() => {
                 if (typeof MemoryViz !== 'undefined') MemoryViz.init();
                 if (typeof Suggestions !== 'undefined') Suggestions.init();
 
+                // Phase 11 modules
+                if (typeof Focus !== 'undefined') Focus.init();
+                if (typeof Folders !== 'undefined') Folders.init();
+                if (typeof Notes !== 'undefined') Notes.init();
+                if (typeof Challenges !== 'undefined') Challenges.init();
+
                 // Smart welcome notification (Phase 7 enhanced)
                 const name = user.displayName || 'there';
                 if (typeof Engage !== 'undefined') {
@@ -562,6 +568,10 @@ const App = (() => {
         document.getElementById('search-btn')?.addEventListener('click', () => { if (typeof Search !== 'undefined') Search.open(); });
         document.getElementById('theme-btn')?.addEventListener('click', () => { if (typeof Themes !== 'undefined') Themes.open(); });
         document.getElementById('pdf-export-btn')?.addEventListener('click', () => { DocHelper.printPDF(); });
+
+        // Phase 11: Focus, Notes buttons
+        document.getElementById('focus-btn')?.addEventListener('click', () => { if (typeof Focus !== 'undefined') Focus.open(); });
+        document.getElementById('notes-btn')?.addEventListener('click', () => { if (typeof Notes !== 'undefined') Notes.toggle(); });
 
         // Feature nav collapse (desktop)
         const collapseBtn = document.querySelector('.fnav-collapse-btn');
