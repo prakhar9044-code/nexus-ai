@@ -424,6 +424,13 @@ const App = (() => {
                         if (typeof Notes !== 'undefined') Notes.init();
                         if (typeof Challenges !== 'undefined') Challenges.init();
 
+                        // Phase 12 modules
+                        if (typeof Analytics !== 'undefined') Analytics.init();
+                        if (typeof Recap !== 'undefined') Recap.init();
+                        if (typeof Flashcards !== 'undefined') Flashcards.init();
+                        if (typeof Export !== 'undefined') Export.init();
+                        if (typeof Reactions !== 'undefined') Reactions.init();
+
                         // Smart welcome notification (Phase 7 enhanced)
                         const name = user.displayName || 'there';
                         if (typeof Engage !== 'undefined') {
@@ -604,6 +611,11 @@ const App = (() => {
         // Phase 11: Focus, Notes buttons
         document.getElementById('focus-btn')?.addEventListener('click', () => { if (typeof Focus !== 'undefined') Focus.open(); });
         document.getElementById('notes-btn')?.addEventListener('click', () => { if (typeof Notes !== 'undefined') Notes.toggle(); });
+
+        // Phase 12: Recap, Flashcards, Export buttons
+        document.getElementById('recap-btn')?.addEventListener('click', () => { if (typeof Recap !== 'undefined') Recap.open(); });
+        document.getElementById('flashcards-btn')?.addEventListener('click', () => { if (typeof Flashcards !== 'undefined') Flashcards.open(); });
+        document.getElementById('export-btn')?.addEventListener('click', () => { if (typeof Export !== 'undefined') Export.open(); });
 
         // Feature nav collapse (desktop)
         const collapseBtn = document.querySelector('.fnav-collapse-btn');
