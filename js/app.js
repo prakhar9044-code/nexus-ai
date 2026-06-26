@@ -349,77 +349,109 @@ const App = (() => {
         // Init error handler first (Phase 8)
         if (typeof ErrorHandler !== 'undefined') ErrorHandler.init();
 
+        // SAFETY: Force-dismiss preloader after 6 seconds no matter what
+        setTimeout(() => {
+            const preloader = document.getElementById('preloader');
+            if (preloader && preloader.style.display !== 'none') {
+                console.warn('[App] Safety timeout: force-dismissing preloader');
+                if (typeof Preloader !== 'undefined') Preloader.finish();
+                else {
+                    preloader.classList.add('hidden');
+                    setTimeout(() => preloader.style.display = 'none', 600);
+                    document.getElementById('app')?.classList.add('visible');
+                }
+            }
+        }, 6000);
+
         // Auth gate — redirect if not logged in
         Auth.onAuthChange(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
-            // User is logged in — set up the app
-            setupUserUI(user);
-            await DB.migrateFromLocalStorage();
-            // Load AI Memory profile
-            if (typeof Memory !== 'undefined') Memory.load().catch(() => {});
-            const streak = await DB.updateStreak();
-            // Initialize Firestore Sync Engine (Phase 6)
-            if (typeof Sync !== 'undefined') Sync.init().catch(() => {});
+            try {
+                // User is logged in — set up the app
+                setupUserUI(user);
+                let streak = 0;
+                try {
+                    await DB.migrateFromLocalStorage();
+                } catch(e) { console.warn('[App] DB migration error:', e); }
+                // Load AI Memory profile
+                if (typeof Memory !== 'undefined') Memory.load().catch(() => {});
+                try {
+                    streak = await DB.updateStreak();
+                } catch(e) { console.warn('[App] Streak error:', e); }
+                // Initialize Firestore Sync Engine (Phase 6)
+                if (typeof Sync !== 'undefined') Sync.init().catch(() => {});
 
-            Preloader.init();
-            setTimeout(() => {
-                Settings.init();
-                Notify.init();
-                setupNav();
-                setupVoice();
-                setupKeyboard();
-                setupBugReport();
-                setupUserDropdown();
-                Attachment.init();
-                Chat.init();
-                Router.go('chat');
-                Settings.applyTheme();
-                // Initialize Engagement Engine (Phase 7)
-                if (typeof Engage !== 'undefined') Engage.init();
+                Preloader.init();
+                setTimeout(() => {
+                    try {
+                        Settings.init();
+                        Notify.init();
+                        setupNav();
+                        setupVoice();
+                        setupKeyboard();
+                        setupBugReport();
+                        setupUserDropdown();
+                        Attachment.init();
+                        Chat.init();
+                        Router.go('chat');
+                        Settings.applyTheme();
+                        // Initialize Engagement Engine (Phase 7)
+                        if (typeof Engage !== 'undefined') Engage.init();
 
-                // Phase 8 modules
-                if (typeof Voice !== 'undefined' && Voice.init) Voice.init();
-                if (typeof FileHandler !== 'undefined') FileHandler.init();
-                if (typeof I18n !== 'undefined') I18n.init();
-                if (typeof Social !== 'undefined') Social.init();
+                        // Phase 8 modules
+                        if (typeof Voice !== 'undefined' && Voice.init) Voice.init();
+                        if (typeof FileHandler !== 'undefined') FileHandler.init();
+                        if (typeof I18n !== 'undefined') I18n.init();
+                        if (typeof Social !== 'undefined') Social.init();
 
-                // Phase 9 modules
-                if (typeof Search !== 'undefined') Search.init();
-                if (typeof Templates !== 'undefined') Templates.init();
-                if (typeof Themes !== 'undefined') Themes.init();
-                if (typeof Shortcuts !== 'undefined') Shortcuts.init();
+                        // Phase 9 modules
+                        if (typeof Search !== 'undefined') Search.init();
+                        if (typeof Templates !== 'undefined') Templates.init();
+                        if (typeof Themes !== 'undefined') Themes.init();
+                        if (typeof Shortcuts !== 'undefined') Shortcuts.init();
 
-                // Phase 10 modules
-                if (typeof Personas !== 'undefined') Personas.init();
-                if (typeof MemoryViz !== 'undefined') MemoryViz.init();
-                if (typeof Suggestions !== 'undefined') Suggestions.init();
+                        // Phase 10 modules
+                        if (typeof Personas !== 'undefined') Personas.init();
+                        if (typeof MemoryViz !== 'undefined') MemoryViz.init();
+                        if (typeof Suggestions !== 'undefined') Suggestions.init();
 
-                // Phase 11 modules
-                if (typeof Focus !== 'undefined') Focus.init();
-                if (typeof Folders !== 'undefined') Folders.init();
-                if (typeof Notes !== 'undefined') Notes.init();
-                if (typeof Challenges !== 'undefined') Challenges.init();
+                        // Phase 11 modules
+                        if (typeof Focus !== 'undefined') Focus.init();
+                        if (typeof Folders !== 'undefined') Folders.init();
+                        if (typeof Notes !== 'undefined') Notes.init();
+                        if (typeof Challenges !== 'undefined') Challenges.init();
 
-                // Smart welcome notification (Phase 7 enhanced)
-                const name = user.displayName || 'there';
-                if (typeof Engage !== 'undefined') {
-                    const greet = Engage.getSmartGreeting();
-                    Notify.add('info', greet.greeting, 'Ready to learn and grow today? 🚀' + (greet.suffix ? ' ' + greet.suffix : ''), '👋');
-                } else {
-                    Notify.add('info', `Welcome back, ${name}!`, 'Ready to learn and grow today? 🚀', '👋');
-                }
-                if (streak > 1) {
-                    Notify.add('streak', `🔥 ${streak}-day streak!`, `You've been consistent for ${streak} days. Keep it up!`, '🔥');
-                }
-                if (streak === 7) {
-                    Notify.showAchievement('🔥', 'Week Warrior!', 'You maintained a 7-day learning streak!', 100);
-                } else if (streak === 30) {
-                    Notify.showAchievement('💎', 'Monthly Master!', 'Incredible! 30 days of consistent learning!', 500);
-                }
-            }, 100);
+                        // Smart welcome notification (Phase 7 enhanced)
+                        const name = user.displayName || 'there';
+                        if (typeof Engage !== 'undefined') {
+                            const greet = Engage.getSmartGreeting();
+                            Notify.add('info', greet.greeting, 'Ready to learn and grow today? 🚀' + (greet.suffix ? ' ' + greet.suffix : ''), '👋');
+                        } else {
+                            Notify.add('info', `Welcome back, ${name}!`, 'Ready to learn and grow today? 🚀', '👋');
+                        }
+                        if (streak > 1) {
+                            Notify.add('streak', `🔥 ${streak}-day streak!`, `You've been consistent for ${streak} days. Keep it up!`, '🔥');
+                        }
+                        if (streak === 7) {
+                            Notify.showAchievement('🔥', 'Week Warrior!', 'You maintained a 7-day learning streak!', 100);
+                        } else if (streak === 30) {
+                            Notify.showAchievement('💎', 'Monthly Master!', 'Incredible! 30 days of consistent learning!', 500);
+                        }
+                    } catch(moduleErr) {
+                        console.error('[App] Module init error:', moduleErr);
+                        // Force show the app even if modules failed
+                        Preloader.finish();
+                    }
+                }, 100);
+            } catch(err) {
+                console.error('[App] Init error:', err);
+                // Force show the app even if something failed
+                Preloader.init();
+                Preloader.finish();
+            }
         });
     }
     function setupUserUI(user) {
