@@ -4,6 +4,13 @@ const Nexus = (() => {
     const MODEL = 'gemini-2.5-flash';
     function getUrlBase() { return `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}`; }
 
+    // Detect if user wants a detailed/long response
+    const DETAIL_PATTERNS = /\b(detail(ed)?|in[- ]?depth|comprehensive|thorough|explain (everything|fully|completely)|deep dive|elaborate|long (answer|response|explanation)|step[- ]by[- ]step|full (guide|tutorial|explanation)|research|everything about|tell me all|complete guide|extensively|exhaustive)\b/i;
+    function isDetailedRequest(text) { return DETAIL_PATTERNS.test(text); }
+
+    // Default concise instruction — appended unless user asks for detail
+    const CONCISE_INSTRUCTION = `\n\nIMPORTANT RESPONSE LENGTH RULE: Keep responses SHORT and concise by default (3-8 sentences or ~150-300 words). Use bullet points over paragraphs. Skip unnecessary introductions and filler. Only give detailed/long responses when the user EXPLICITLY asks for detail, depth, or step-by-step explanations.`;
+
     const PROMPTS = {
         chat: `You are Nexus — a warm, knowledgeable, and professional AI study assistant developed by Prakhar. You help students learn across all subjects. Use markdown formatting, tables, code blocks. Be encouraging, clear, and thorough. Use emojis occasionally. Respond in the same language the user writes in (English or Hindi).`,
 
@@ -230,13 +237,19 @@ When the user tells you what they did, award XP appropriately and show their upd
         const personaCtx = (featureId === 'chat' && typeof Personas !== 'undefined') ? '\n\nPERSONA STYLE: ' + Personas.getSystemPrompt() : '';
         // Phase 13: Inject custom system prompt if active
         const customPromptCtx = (typeof SystemPrompts !== 'undefined') ? '\n\n' + SystemPrompts.getActivePrompt().prompt : '';
-        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx + personaCtx + customPromptCtx;
+        // Detect if this is a detailed request
+        const wantsDetail = isDetailedRequest(userMessage);
+        const conciseCtx = wantsDetail ? '' : CONCISE_INSTRUCTION;
+        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx + personaCtx + customPromptCtx + conciseCtx;
+
+        // Dynamic token limit: 1024 for normal, 4096 for detailed requests
+        const maxTokens = wantsDetail ? 4096 : 1024;
 
         const requestBody = {
             model: MODEL,
             system_instruction: { parts: [{ text: fullPrompt }] },
             contents: conv,
-            generationConfig: { temperature: 0.7, topP: 0.9, maxOutputTokens: 4096 },
+            generationConfig: { temperature: 0.7, topP: 0.9, maxOutputTokens: maxTokens },
             safetySettings: [
                 { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
                 { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
