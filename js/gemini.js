@@ -205,6 +205,7 @@ When the user tells you what they did, award XP appropriately and show their upd
     }
 
     // Raw stream from API (uses Netlify proxy by default, direct API as fallback)
+    // Includes automatic retry with exponential backoff for rate limits
     async function* rawStream(featureId, userMessage, extraContext = '') {
         const userKey = getApiKey(); // Optional: user's own key from Settings
         const conv = getConversation(featureId);
@@ -227,7 +228,9 @@ When the user tells you what they did, award XP appropriately and show their upd
         const agentCtx = (typeof AgentState !== 'undefined') ? AgentState.buildContext(featureId) : '';
         // Phase 10: Inject active persona prompt (only for chat)
         const personaCtx = (featureId === 'chat' && typeof Personas !== 'undefined') ? '\n\nPERSONA STYLE: ' + Personas.getSystemPrompt() : '';
-        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx + personaCtx;
+        // Phase 13: Inject custom system prompt if active
+        const customPromptCtx = (typeof SystemPrompts !== 'undefined') ? '\n\n' + SystemPrompts.getActivePrompt().prompt : '';
+        const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx + personaCtx + customPromptCtx;
 
         const requestBody = {
             model: MODEL,
@@ -247,43 +250,62 @@ When the user tells you what they did, award XP appropriately and show their upd
             ? `${getUrlBase()}:streamGenerateContent?alt=sse&key=${userKey}`
             : '/api/chat';
 
-        try {
-            const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
-            if (!resp.ok) {
-                conv.pop();
-                if (resp.status === 429) throw new Error('Rate limited — please wait a moment.');
-                if (resp.status === 400 || resp.status === 403) throw new Error('API key issue.');
-                throw new Error('Something went wrong.');
-            }
-            const reader = resp.body.getReader();
-            const decoder = new TextDecoder();
-            let fullText = '', buffer = '';
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const json = line.slice(6).trim();
-                        if (!json || json === '[DONE]') continue;
-                        try {
-                            const d = JSON.parse(json);
-                            const chunk = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                            if (chunk) { fullText += chunk; yield chunk; }
-                        } catch (e) {}
+        const MAX_RETRIES = 3;
+        const BASE_DELAY = 3000; // 3 seconds
+
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
+                if (!resp.ok) {
+                    // Rate limited — retry with backoff
+                    if (resp.status === 429 && attempt < MAX_RETRIES) {
+                        const delay = BASE_DELAY * Math.pow(2, attempt); // 3s, 6s, 12s
+                        console.log(`[Nexus] Rate limited (429), retry ${attempt + 1}/${MAX_RETRIES} in ${delay / 1000}s...`);
+                        if (typeof Toast !== 'undefined') Toast.show(`⏳ Rate limited, retrying in ${delay / 1000}s...`, 'info');
+                        await new Promise(r => setTimeout(r, delay));
+                        continue;
+                    }
+                    conv.pop();
+                    if (resp.status === 429) throw new Error('Rate limited — all retries failed. Please wait 30 seconds and try again. 🔄');
+                    if (resp.status === 400 || resp.status === 403) throw new Error('API key issue — check your key in Settings.');
+                    throw new Error('Something went wrong. Please try again.');
+                }
+                const reader = resp.body.getReader();
+                const decoder = new TextDecoder();
+                let fullText = '', buffer = '';
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const json = line.slice(6).trim();
+                            if (!json || json === '[DONE]') continue;
+                            try {
+                                const d = JSON.parse(json);
+                                const chunk = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                                if (chunk) { fullText += chunk; yield chunk; }
+                            } catch (e) {}
+                        }
                     }
                 }
-            }
-            if (fullText) {
-                conv.push({ role: 'model', parts: [{ text: fullText }] });
-                // Update agent state from the response
-                if (typeof AgentState !== 'undefined') {
-                    AgentState.parseAndUpdate(featureId, userMessage, fullText);
+                if (fullText) {
+                    conv.push({ role: 'model', parts: [{ text: fullText }] });
+                    // Update agent state from the response
+                    if (typeof AgentState !== 'undefined') {
+                        AgentState.parseAndUpdate(featureId, userMessage, fullText);
+                    }
+                }
+                return; // Success — exit retry loop
+            } catch (err) {
+                if (attempt >= MAX_RETRIES || !err.message?.includes('Rate limited')) {
+                    conv.pop();
+                    throw err;
                 }
             }
-        } catch (err) { conv.pop(); throw err; }
+        }
     }
 
     // Throttled stream — yields word-by-word for slower, impactful rendering
@@ -337,5 +359,5 @@ When the user tells you what they did, award XP appropriately and show their upd
         return patterns.some(p => p.test(t));
     }
 
-    return { stream, ask, generateImage, isImageRequest, getConversation, resetConversation, resetAll, PROMPTS };
+    return { stream, rawStream, ask, generateImage, isImageRequest, getConversation, resetConversation, resetAll, PROMPTS };
 })();

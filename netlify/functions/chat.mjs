@@ -1,8 +1,9 @@
 // Netlify Serverless Function — Gemini API Proxy with Multi-Key Rotation
 // Keys are stored in GEMINI_API_KEYS env var as comma-separated values
-// If one key hits rate limit (429), it automatically tries the next key
+// Uses random key selection + per-key cooldown tracking via global state
 
-let currentKeyIndex = 0; // Round-robin starting index
+// In-memory cooldown map (per warm instance)
+const cooldowns = new Map(); // key => timestamp when cooldown expires
 
 function getKeys() {
   // Support both: single key (GEMINI_API_KEY) and multiple keys (GEMINI_API_KEYS)
@@ -10,6 +11,19 @@ function getKeys() {
   const single = process.env.GEMINI_API_KEY || '';
   const raw = multi || single;
   return raw.split(',').map(k => k.trim()).filter(Boolean);
+}
+
+function getAvailableKeys(keys) {
+  const now = Date.now();
+  return keys.filter((key, i) => {
+    const cooldownEnd = cooldowns.get(i) || 0;
+    return now >= cooldownEnd;
+  });
+}
+
+function cooldownKey(keyIndex, durationMs = 65000) {
+  // Cool down for 65 seconds (slightly over 1 min to be safe)
+  cooldowns.set(keyIndex, Date.now() + durationMs);
 }
 
 export default async (req) => {
@@ -40,9 +54,16 @@ export default async (req) => {
     safetySettings: body.safetySettings
   });
 
-  // Try each key, starting from current index (round-robin)
-  for (let attempt = 0; attempt < keys.length; attempt++) {
-    const keyIndex = (currentKeyIndex + attempt) % keys.length;
+  // Get keys that aren't on cooldown first, fall back to all keys
+  let availableKeys = getAvailableKeys(keys);
+  const keysToTry = availableKeys.length > 0 ? availableKeys : keys;
+
+  // Shuffle keys randomly so we don't always hit key #1 first
+  const shuffledIndices = keys.map((_, i) => i)
+    .filter(i => keysToTry.includes(keys[i]))
+    .sort(() => Math.random() - 0.5);
+
+  for (const keyIndex of shuffledIndices) {
     const apiKey = keys[keyIndex];
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
 
@@ -53,9 +74,10 @@ export default async (req) => {
         body: payload
       });
 
-      // If rate limited (429) or quota exceeded (403), try the next key
+      // If rate limited (429) or quota exceeded (403), cooldown this key and try next
       if (geminiResponse.status === 429 || geminiResponse.status === 403) {
-        console.log(`Key #${keyIndex + 1} rate limited (${geminiResponse.status}), trying next...`);
+        console.log(`Key #${keyIndex + 1} rate limited (${geminiResponse.status}), cooling down for 65s`);
+        cooldownKey(keyIndex);
         continue;
       }
 
@@ -66,9 +88,6 @@ export default async (req) => {
           headers: { 'Content-Type': 'text/plain' }
         });
       }
-
-      // Success! Advance round-robin to next key for load balancing
-      currentKeyIndex = (keyIndex + 1) % keys.length;
 
       // Stream the SSE response back to the client
       return new Response(geminiResponse.body, {
@@ -82,16 +101,21 @@ export default async (req) => {
       });
     } catch (err) {
       console.log(`Key #${keyIndex + 1} fetch error: ${err.message}, trying next...`);
+      cooldownKey(keyIndex, 10000); // shorter cooldown for fetch errors
       continue;
     }
   }
 
-  // All keys exhausted
+  // All keys exhausted — tell client to retry after a delay
   return new Response(JSON.stringify({
-    error: 'All API keys are rate limited. Please try again in a minute. 🔄'
+    error: 'All API keys are rate limited. Please try again in a minute. 🔄',
+    retryAfter: 30
   }), {
     status: 429,
-    headers: { 'Content-Type': 'application/json' }
+    headers: {
+      'Content-Type': 'application/json',
+      'Retry-After': '30'
+    }
   });
 };
 
