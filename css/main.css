@@ -110,6 +110,7 @@ body {
     line-height: 1.6;
     overflow: hidden;
     min-height: 100vh;
+    min-height: 100dvh;
     transition: background var(--transition-smooth), color var(--transition-smooth);
 }
 
@@ -120,14 +121,14 @@ body {
 
 /* App Layout */
 #app {
-    display: flex; height: 100vh;
+    display: flex; height: 100vh; height: 100dvh;
     opacity: 0; transition: opacity 0.5s ease;
 }
 #app.visible { opacity: 1; }
 
 /* ---- SIDEBAR ---- */
 .sidebar {
-    width: var(--sidebar-width); height: 100vh;
+    width: var(--sidebar-width); height: 100vh; height: 100dvh;
     background: var(--bg-sidebar); border-right: 1px solid var(--border);
     display: flex; flex-direction: column;
     transition: transform var(--transition-smooth), background var(--transition-smooth);
@@ -194,7 +195,7 @@ body {
 .sidebar-footer-btn svg { width: 16px; height: 16px; opacity: 0.6; }
 
 /* ---- MAIN CONTENT ---- */
-.main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; min-width: 0; }
+.main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; height: 100dvh; min-width: 0; }
 .main-header {
     height: var(--header-height); padding: 0 24px;
     display: flex; align-items: center; justify-content: space-between;

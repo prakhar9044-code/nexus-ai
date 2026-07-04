@@ -40,45 +40,22 @@ const Voice = (() => {
         const inputArea = document.querySelector('.input-area');
         if (!inputArea) return;
 
-        // Add mic button if speech recognition supported
+        // Use existing mic button from HTML (app.js setupVoice handles click + callbacks)
         if (isSupported()) {
-            micBtn = document.createElement('button');
-            micBtn.className = 'voice-mic-btn';
-            micBtn.title = 'Voice input (Ctrl+Shift+M)';
-            micBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
-            
-            const sendBtn = inputArea.querySelector('.send-btn');
-            if (sendBtn) sendBtn.parentElement.insertBefore(micBtn, sendBtn);
+            micBtn = document.getElementById('mic-btn');
 
-            micBtn.addEventListener('click', () => toggleListening());
-
-            // Floating transcript
+            // Floating transcript overlay
             transcriptEl = document.createElement('div');
             transcriptEl.className = 'voice-transcript';
             inputArea.style.position = 'relative';
             inputArea.appendChild(transcriptEl);
 
-            // Wire up callbacks
-            setOnTranscript(text => {
-                transcriptEl.textContent = text;
-                transcriptEl.classList.add('active');
-            });
-            setOnFinalTranscript(text => {
-                const chatInput = document.querySelector('.chat-input');
-                if (chatInput) {
-                    chatInput.value += (chatInput.value ? ' ' : '') + text;
-                    chatInput.dispatchEvent(new Event('input'));
-                }
-                transcriptEl.classList.remove('active');
-            });
-            setOnListeningChange(listening => {
-                if (micBtn) micBtn.classList.toggle('recording', listening);
-                if (!listening) transcriptEl.classList.remove('active');
-            });
+            // Note: callbacks (onTranscript, onFinalTranscript, onListeningChange)
+            // are set by app.js setupVoice() — do NOT set them here to avoid conflicts
 
-            // Keyboard shortcut
+            // Keyboard shortcut (Ctrl+M)
             document.addEventListener('keydown', e => {
-                if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+                if ((e.ctrlKey && e.key === 'm') || (e.ctrlKey && e.shiftKey && e.key === 'M')) {
                     e.preventDefault();
                     toggleListening();
                 }

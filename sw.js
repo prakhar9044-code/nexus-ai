@@ -1,5 +1,5 @@
 /* NEXUS v3.0 — Service Worker (Offline + Install + Push Notifications) */
-const CACHE_NAME = 'nexus-v14-cache';
+const CACHE_NAME = 'nexus-v15-cache';
 const ASSETS = [
   '/',
   '/index.html',
