@@ -53,6 +53,10 @@ const Chat = (() => {
         const msgEl = addMessage('nexus', '', true);
         const bubble = msgEl.querySelector('.message-bubble');
 
+        // Get attachment context and image data if any
+        const attachCtx = (typeof Attachment !== 'undefined' && Attachment.hasAttachment()) ? Attachment.getAttachmentContext() : '';
+        const imageData = (typeof Attachment !== 'undefined') ? Attachment.getImageData() : null;
+
         // Smart Intent Router — auto-detect which agent should handle this
         let routedFeature = 'chat';
         if (typeof IntentRouter !== 'undefined') {
@@ -79,11 +83,16 @@ const Chat = (() => {
         }
 
         let full = '';
-        for await (const chunk of Nexus.stream(routedFeature, text)) {
+        for await (const chunk of Nexus.stream(routedFeature, text, attachCtx, imageData)) {
             full += chunk; bubble.innerHTML = renderMd(full); scrollBottom();
         }
         bubble.innerHTML = renderMd(full); addCopyBtns(bubble); addActions(msgEl, full);
         scrollBottom(); Voice.speak(full); saveCurrent(); updateHistory();
+
+        // Clear attachment after sending
+        if (typeof Attachment !== 'undefined' && Attachment.hasAttachment()) {
+            Attachment.clear();
+        }
 
         // Memory: extract facts from this exchange
         if (typeof Memory !== 'undefined') {

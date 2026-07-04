@@ -315,17 +315,26 @@ const Attachment = (() => {
     function getAttachmentContext() {
         if (!currentFile) return '';
         let ctx = `[User attached: "${currentFile.name}" (${currentFile.type}, ${(currentFile.size/1024).toFixed(1)} KB)]`;
-        if (currentBase64 && typeof currentBase64 === 'string' && !currentBase64.startsWith('data:image')) {
-            ctx += '\n\nFile contents:\n' + currentBase64.substring(0, 5000);
+        if (currentBase64 && typeof currentBase64 === 'string' && !currentBase64.startsWith('data:')) {
+            // Text file contents
+            ctx += '\n\nFile contents:\n' + currentBase64.substring(0, 8000);
         }
         if (currentFile.type.startsWith('image/')) {
-            ctx += '\n[This is an image. Acknowledge receipt and ask what to do with it.]';
+            ctx += '\n[Image attached — analyze, describe, or answer questions about it.]';
         }
         return ctx;
     }
 
+    function getImageData() {
+        if (!currentFile || !currentFile.type.startsWith('image/') || !currentBase64) return null;
+        // Extract base64 data without the data:image/xxx;base64, prefix
+        const base64Only = currentBase64.split(',')[1];
+        return { mimeType: currentFile.type, data: base64Only };
+    }
+
+    function getFile() { return currentFile; }
     function hasAttachment() { return !!currentFile; }
-    return { init, clear, getAttachmentContext, hasAttachment };
+    return { init, clear, getAttachmentContext, getImageData, getFile, hasAttachment };
 })();
 
 const Router = (() => {

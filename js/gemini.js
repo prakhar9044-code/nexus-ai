@@ -213,14 +213,25 @@ When the user tells you what they did, award XP appropriately and show their upd
 
     // Raw stream from API (uses Netlify proxy by default, direct API as fallback)
     // Includes automatic retry with exponential backoff for rate limits
-    async function* rawStream(featureId, userMessage, extraContext = '') {
+    // imageData: optional { mimeType, data } for multimodal (image) requests
+    async function* rawStream(featureId, userMessage, extraContext = '', imageData = null) {
         const userKey = getApiKey(); // Optional: user's own key from Settings
         const conv = getConversation(featureId);
 
         // Context Window Manager: trim old messages before adding new one
         if (typeof ContextManager !== 'undefined') ContextManager.preProcess(featureId);
 
-        conv.push({ role: 'user', parts: [{ text: userMessage }] });
+        // Build user message parts (text + optional image)
+        const userParts = [{ text: userMessage }];
+        if (imageData && imageData.data && imageData.mimeType) {
+            userParts.push({
+                inline_data: {
+                    mime_type: imageData.mimeType,
+                    data: imageData.data
+                }
+            });
+        }
+        conv.push({ role: 'user', parts: userParts });
 
         const basePrompt = PROMPTS[featureId] || PROMPTS.chat;
         const levelCtx = getLevelContext();
@@ -237,12 +248,12 @@ When the user tells you what they did, award XP appropriately and show their upd
         const personaCtx = (featureId === 'chat' && typeof Personas !== 'undefined') ? '\n\nPERSONA STYLE: ' + Personas.getSystemPrompt() : '';
         // Phase 13: Inject custom system prompt if active
         const customPromptCtx = (typeof SystemPrompts !== 'undefined') ? '\n\n' + SystemPrompts.getActivePrompt().prompt : '';
-        // Detect if this is a detailed request
-        const wantsDetail = isDetailedRequest(userMessage);
+        // Detect if this is a detailed request (or has an image — images need more tokens)
+        const wantsDetail = isDetailedRequest(userMessage) || !!imageData;
         const conciseCtx = wantsDetail ? '' : CONCISE_INSTRUCTION;
         const fullPrompt = basePrompt + '\n\n' + levelCtx + langInstr + extra + memoryCtx + ragCtx + agentCtx + personaCtx + customPromptCtx + conciseCtx;
 
-        // Dynamic token limit: 1024 for normal, 4096 for detailed requests
+        // Dynamic token limit: 1024 for normal, 4096 for detailed/image requests
         const maxTokens = wantsDetail ? 4096 : 1024;
 
         const requestBody = {
@@ -322,9 +333,9 @@ When the user tells you what they did, award XP appropriately and show their upd
     }
 
     // Throttled stream — yields word-by-word for slower, impactful rendering
-    async function* stream(featureId, userMessage, extraContext = '') {
+    async function* stream(featureId, userMessage, extraContext = '', imageData = null) {
         let wordBuffer = '';
-        for await (const chunk of rawStream(featureId, userMessage, extraContext)) {
+        for await (const chunk of rawStream(featureId, userMessage, extraContext, imageData)) {
             wordBuffer += chunk;
             // Yield word by word with small delays
             const words = wordBuffer.split(/( +)/);
@@ -339,9 +350,9 @@ When the user tells you what they did, award XP appropriately and show their upd
     }
 
     // Non-streaming for quick responses
-    async function ask(featureId, userMessage, extraContext = '') {
+    async function ask(featureId, userMessage, extraContext = '', imageData = null) {
         let full = '';
-        for await (const chunk of stream(featureId, userMessage, extraContext)) {
+        for await (const chunk of stream(featureId, userMessage, extraContext, imageData)) {
             full += chunk;
         }
         return full;
