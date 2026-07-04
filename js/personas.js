@@ -46,14 +46,16 @@ const Personas = (() => {
 
     const style = document.createElement('style');
     style.textContent = `
-    .persona-selector{position:relative;display:inline-flex;align-items:center}
+    .persona-selector{position:relative;display:inline-flex;align-items:center;z-index:500}
     .persona-btn{display:flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg-secondary);color:var(--text-primary);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all 0.2s;white-space:nowrap}
     .persona-btn:hover{border-color:var(--accent);background:var(--bg-hover)}
     .persona-btn .persona-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .persona-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg-primary);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.3);min-width:220px;z-index:100;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all 0.2s}
-    .persona-dropdown.active{opacity:1;visibility:visible;transform:translateY(0)}
-    .persona-dropdown-header{padding:10px 14px;border-bottom:1px solid var(--border);font-size:0.72rem;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.5px}
-    .persona-option{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background 0.15s}
+    .persona-backdrop{position:fixed;inset:0;z-index:9400;background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:all 0.2s}
+    .persona-backdrop.active{opacity:1;visibility:visible}
+    .persona-dropdown{position:fixed;top:60px;left:50%;transform:translateX(-50%) scale(0.95);background:var(--bg-primary);border:1px solid var(--border);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.35);min-width:260px;max-width:320px;z-index:9500;opacity:0;visibility:hidden;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);overflow:hidden}
+    .persona-dropdown.active{opacity:1;visibility:visible;transform:translateX(-50%) scale(1)}
+    .persona-dropdown-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:0.72rem;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.5px}
+    .persona-option{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:background 0.15s}
     .persona-option:hover{background:var(--bg-hover)}
     .persona-option:last-child{border-radius:0 0 14px 14px}
     .persona-option.active{background:var(--accent-alpha, rgba(74,108,247,0.1))}
@@ -63,6 +65,7 @@ const Personas = (() => {
     .persona-option-desc{font-size:0.68rem;color:var(--text-tertiary)}
     .persona-option-check{font-size:0.75rem;color:var(--accent);opacity:0}
     .persona-option.active .persona-option-check{opacity:1}
+    @media(max-width:768px){.persona-dropdown{left:10px;right:10px;transform:scale(0.95);min-width:auto}.persona-dropdown.active{transform:scale(1)}}
     `;
     document.head.appendChild(style);
 
@@ -78,6 +81,8 @@ const Personas = (() => {
         if (!headerLeft) return;
 
         const p = list[current];
+
+        // Button in header
         const container = document.createElement('div');
         container.className = 'persona-selector';
         container.id = 'persona-selector';
@@ -87,38 +92,66 @@ const Personas = (() => {
                 ${p.icon} ${p.name}
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
-            <div class="persona-dropdown" id="persona-dropdown">
-                <div class="persona-dropdown-header">Choose AI Persona</div>
-                ${Object.values(list).map(persona => `
-                    <div class="persona-option ${persona.id === current ? 'active' : ''}" data-id="${persona.id}">
-                        <span class="persona-option-icon">${persona.icon}</span>
-                        <div class="persona-option-info">
-                            <div class="persona-option-name">${persona.name}</div>
-                            <div class="persona-option-desc">${persona.desc}</div>
-                        </div>
-                        <span class="persona-option-check">✓</span>
-                    </div>
-                `).join('')}
-            </div>
         `;
         headerLeft.appendChild(container);
 
-        // Toggle dropdown
+        // Backdrop + Dropdown on body (for proper z-index stacking)
+        const backdrop = document.createElement('div');
+        backdrop.className = 'persona-backdrop';
+        backdrop.id = 'persona-backdrop';
+        document.body.appendChild(backdrop);
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'persona-dropdown';
+        dropdown.id = 'persona-dropdown';
+        dropdown.innerHTML = `
+            <div class="persona-dropdown-header">Choose AI Persona</div>
+            ${Object.values(list).map(persona => `
+                <div class="persona-option ${persona.id === current ? 'active' : ''}" data-id="${persona.id}">
+                    <span class="persona-option-icon">${persona.icon}</span>
+                    <div class="persona-option-info">
+                        <div class="persona-option-name">${persona.name}</div>
+                        <div class="persona-option-desc">${persona.desc}</div>
+                    </div>
+                    <span class="persona-option-check">✓</span>
+                </div>
+            `).join('')}
+        `;
+        document.body.appendChild(dropdown);
+
+        // Toggle dropdown + backdrop
         document.getElementById('persona-btn').addEventListener('click', e => {
             e.stopPropagation();
-            document.getElementById('persona-dropdown').classList.toggle('active');
+            const isOpen = dropdown.classList.contains('active');
+            if (isOpen) {
+                dropdown.classList.remove('active');
+                backdrop.classList.remove('active');
+            } else {
+                dropdown.classList.add('active');
+                backdrop.classList.add('active');
+            }
+        });
+
+        // Close on backdrop click
+        backdrop.addEventListener('click', () => {
+            dropdown.classList.remove('active');
+            backdrop.classList.remove('active');
         });
 
         // Close on outside click
-        document.addEventListener('click', () => {
-            document.getElementById('persona-dropdown')?.classList.remove('active');
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#persona-btn') && !e.target.closest('#persona-dropdown')) {
+                dropdown.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
         });
 
         // Select persona
-        container.querySelectorAll('.persona-option').forEach(opt => {
+        dropdown.querySelectorAll('.persona-option').forEach(opt => {
             opt.addEventListener('click', () => {
                 setPersona(opt.dataset.id);
-                document.getElementById('persona-dropdown').classList.remove('active');
+                dropdown.classList.remove('active');
+                backdrop.classList.remove('active');
             });
         });
     }

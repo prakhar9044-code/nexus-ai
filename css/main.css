@@ -217,14 +217,15 @@ body {
 @keyframes pulse-dot {
     0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
 }
-.header-right { display: flex; align-items: center; gap: 4px; }
+.header-right { display: flex; align-items: center; gap: 2px; overflow-x: auto; overflow-y: hidden; max-width: 60vw; scrollbar-width: none; -ms-overflow-style: none; }
+.header-right::-webkit-scrollbar { display: none; }
 .header-btn {
     background: none; border: none; color: var(--text-secondary); cursor: pointer;
-    padding: 8px; border-radius: var(--radius-sm); transition: all var(--transition-fast);
-    display: flex; align-items: center;
+    padding: 6px; border-radius: var(--radius-sm); transition: all var(--transition-fast);
+    display: flex; align-items: center; flex-shrink: 0;
 }
 .header-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-.header-btn svg { width: 18px; height: 18px; }
+.header-btn svg { width: 17px; height: 17px; }
 
 /* Toast */
 .toast-container {
@@ -357,6 +358,14 @@ body {
     align-items: center; justify-content: center; color: white; font-size: 0.65rem; font-weight: 700;
 }
 
+/* ========== TABLET RESPONSIVE ========== */
+@media (max-width: 1100px) {
+    /* Hide less-used buttons on tablets to prevent overflow */
+    #pdf-export-btn, #recap-btn, #flashcards-btn, #export-btn,
+    #bookmarks-btn, #prompts-btn, #bug-report-btn { display: none !important; }
+    .header-btn { padding: 5px; }
+}
+
 /* ========== MOBILE RESPONSIVE ========== */
 @media (max-width: 768px) {
     :root { --sidebar-width: 0px; --header-height: 50px; }
@@ -383,9 +392,17 @@ body {
     .sidebar-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
     /* Header compact */
-    .main-header { padding: 0 12px; height: var(--header-height); }
-    .header-title { font-size: 0.9rem; }
+    .main-header { padding: 0 8px; height: var(--header-height); }
+    .header-title { font-size: 0.85rem; }
+    .header-right { max-width: none; gap: 0; }
     .speaking-label { font-size: 0.65rem; }
+    /* Hide secondary header buttons on mobile */
+    #pdf-export-btn, #recap-btn, #flashcards-btn, #export-btn,
+    #bookmarks-btn, #prompts-btn, #notes-btn, #focus-btn,
+    #bug-report-btn, .voice-waveform, .speaking-label { display: none !important; }
+    .header-btn { padding: 5px; }
+    .header-btn svg { width: 16px; height: 16px; }
+    .persona-btn { font-size: 0.7rem; padding: 4px 8px; }
 
     /* Modal: slide-up bottom sheet on mobile */
     .modal-overlay { align-items: flex-end; }
