@@ -130,7 +130,12 @@ const Voice = (() => {
                 }
             }
             if (interimTranscript && onTranscript) onTranscript(interimTranscript);
-            if (finalTranscript && onFinalTranscript) onFinalTranscript(finalTranscript);
+            if (finalTranscript) {
+                // Phase 15.4: Check for voice commands before passing to chat
+                if (!handleVoiceCommand(finalTranscript)) {
+                    if (onFinalTranscript) onFinalTranscript(finalTranscript);
+                }
+            }
         };
 
         recognition.onerror = (event) => {
@@ -272,6 +277,44 @@ const Voice = (() => {
         currentUtterance = null;
         if (onSpeakingChange) onSpeakingChange(false);
         document.querySelectorAll('.voice-speak-btn.speaking').forEach(b => b.classList.remove('speaking'));
+    }
+
+    // ---- Phase 15.4: Voice Commands ----
+    const VOICE_COMMANDS = [
+        { patterns: ['new chat', 'start new chat', 'new conversation'], action: () => { if (typeof Chat !== 'undefined') { Chat.newChat(); Router.go('chat'); } }, label: 'New Chat' },
+        { patterns: ['dark mode', 'switch to dark', 'dark theme'], action: () => { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('nexus_theme', 'dark'); }, label: 'Dark Mode' },
+        { patterns: ['light mode', 'switch to light', 'light theme'], action: () => { document.documentElement.setAttribute('data-theme', 'light'); localStorage.setItem('nexus_theme', 'light'); }, label: 'Light Mode' },
+        { patterns: ['open planner', 'study planner', 'open plan'], action: () => { if (typeof Planner !== 'undefined') Planner.open(); }, label: 'Study Planner' },
+        { patterns: ['open insights', 'show insights', 'my insights'], action: () => { if (typeof Insights !== 'undefined') Insights.open(); }, label: 'Insights' },
+        { patterns: ['open notes', 'my notes', 'show notes'], action: () => { if (typeof Notes !== 'undefined') Notes.open(); }, label: 'Quick Notes' },
+        { patterns: ['open settings', 'show settings'], action: () => { if (typeof Settings !== 'undefined') Settings.open(); }, label: 'Settings' },
+        { patterns: ['open flashcards', 'show flashcards', 'study cards'], action: () => { if (typeof Flashcards !== 'undefined') Flashcards.open(); }, label: 'Flashcards' },
+        { patterns: ['read last message', 'read that', 'read aloud'], action: () => { const msgs = document.querySelectorAll('.message:not(.user-message) .message-bubble'); if (msgs.length) speakText(msgs[msgs.length-1].textContent); }, label: 'Read Last Message' },
+        { patterns: ['stop speaking', 'stop reading', 'be quiet', 'shut up'], action: () => stopSpeaking(), label: 'Stop Speaking' },
+        { patterns: ['open goals', 'my goals', 'achievements'], action: () => { if (typeof SmartNotify !== 'undefined') SmartNotify.open(); }, label: 'Goals & Achievements' },
+        { patterns: ['export chat', 'save chat'], action: () => { if (typeof Export !== 'undefined') Export.open(); }, label: 'Export Chat' },
+    ];
+
+    function handleVoiceCommand(text) {
+        const lower = text.toLowerCase().trim();
+        // Strip "hey nexus" or "nexus" prefix
+        const cleaned = lower.replace(/^(hey\s+)?nexus[,\s]*/i, '').trim();
+        if (!cleaned || cleaned === lower.replace(/\s/g,'')) {
+            // No "nexus" prefix found — only match if it's a very clear command
+            if (!lower.startsWith('nexus')) return false;
+        }
+        const cmdText = cleaned || lower;
+
+        for (const cmd of VOICE_COMMANDS) {
+            for (const pattern of cmd.patterns) {
+                if (cmdText.includes(pattern)) {
+                    cmd.action();
+                    if (typeof Toast !== 'undefined') Toast.show(`🎤 "${cmd.label}"`, 'success');
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // ---- Event Handlers ----
