@@ -7,7 +7,9 @@ const FormatBar = (() => {
 
     const style = document.createElement('style');
     style.textContent = `
-    .format-toolbar{display:flex;align-items:center;gap:2px;padding:4px 8px;background:var(--bg-secondary);border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;flex-wrap:wrap;transition:all 0.2s}
+    .format-toolbar{display:flex;align-items:center;gap:1px;padding:3px 20px;background:transparent;border:none;flex-wrap:nowrap;transition:all 0.2s;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+    .format-toolbar::-webkit-scrollbar{display:none}
+    @media(max-width:768px){.format-toolbar{padding:3px 10px;gap:0}}
     .format-toolbar.hidden{display:none}
     .fmt-btn{background:none;border:none;cursor:pointer;padding:5px 7px;border-radius:6px;color:var(--text-tertiary);font-size:0.78rem;transition:all 0.15s;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;min-width:28px;height:28px}
     .fmt-btn:hover{color:var(--text-primary);background:var(--bg-hover)}

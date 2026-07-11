@@ -400,6 +400,7 @@ body {
     /* Hide secondary header buttons on mobile */
     #pdf-export-btn, #recap-btn, #flashcards-btn, #export-btn,
     #bookmarks-btn, #prompts-btn, #notes-btn, #focus-btn,
+    #planner-btn, #insights-btn, #threads-btn, #goals-btn, #progress-btn,
     #bug-report-btn, .voice-waveform, .speaking-label { display: none !important; }
     .header-btn { padding: 5px; }
     .header-btn svg { width: 16px; height: 16px; }
