@@ -447,6 +447,12 @@ const App = (() => {
                         if (typeof TypingIndicator !== 'undefined') TypingIndicator.init();
                         if (typeof ScrollFab !== 'undefined') ScrollFab.init();
 
+                        // Phase 14 modules
+                        if (typeof Threads !== 'undefined') Threads.init();
+                        if (typeof Planner !== 'undefined') Planner.init();
+                        if (typeof CommandPalette !== 'undefined') CommandPalette.init();
+                        if (typeof Insights !== 'undefined') Insights.init();
+
                         // Smart welcome notification (Phase 7 enhanced)
                         const name = user.displayName || 'there';
                         if (typeof Engage !== 'undefined') {
@@ -636,6 +642,11 @@ const App = (() => {
         // Phase 13: Bookmarks, System Prompts buttons
         document.getElementById('bookmarks-btn')?.addEventListener('click', () => { if (typeof Bookmarks !== 'undefined') Bookmarks.open(); });
         document.getElementById('prompts-btn')?.addEventListener('click', () => { if (typeof SystemPrompts !== 'undefined') SystemPrompts.open(); });
+
+        // Phase 14: Planner, Insights, Threads buttons
+        document.getElementById('planner-btn')?.addEventListener('click', () => { if (typeof Planner !== 'undefined') Planner.open(); });
+        document.getElementById('insights-btn')?.addEventListener('click', () => { if (typeof Insights !== 'undefined') Insights.open(); });
+        document.getElementById('threads-btn')?.addEventListener('click', () => { if (typeof Threads !== 'undefined') Threads.openPanel(); });
 
         // Feature nav collapse (desktop)
         const collapseBtn = document.querySelector('.fnav-collapse-btn');

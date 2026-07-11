@@ -1,5 +1,5 @@
 /* NEXUS v3.0 — Service Worker (Offline + Install + Push Notifications) */
-const CACHE_NAME = 'nexus-v15-cache';
+const CACHE_NAME = 'nexus-v16-cache';
 const ASSETS = [
   '/',
   '/index.html',
@@ -49,6 +49,10 @@ const ASSETS = [
   '/js/system-prompts.js',
   '/js/typing-indicator.js',
   '/js/scroll-fab.js',
+  '/js/threads.js',
+  '/js/planner.js',
+  '/js/command-palette.js',
+  '/js/insights.js',
   '/js/features/feature-chat.js',
   '/js/features/all-features.js'
 ];

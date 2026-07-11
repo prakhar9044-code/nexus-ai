@@ -89,6 +89,9 @@ const Chat = (() => {
         bubble.innerHTML = renderMd(full); addCopyBtns(bubble); addActions(msgEl, full);
         scrollBottom(); Voice.speak(full); saveCurrent(); updateHistory();
 
+        // Track activity for Insights (Phase 14)
+        if (typeof Insights !== 'undefined') Insights.trackMessage();
+
         // Clear attachment after sending
         if (typeof Attachment !== 'undefined' && Attachment.hasAttachment()) {
             Attachment.clear();
